@@ -284,4 +284,8 @@
     <string name="accessibility_quick_settings_gaming_mode_on">Gaming Mode</string>
     <string name="accessibility_quick_settings_gaming_mode_off">Gaming Mode</string>
 
+    <!-- Typing virtual buttons -->
+    <string name="accessibility_dpad_left">Cursor left</string>
+    <string name="accessibility_dpad_right">Cursor right</string>
+
 </resources>
