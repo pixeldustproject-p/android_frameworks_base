@@ -2301,6 +2301,8 @@ public final class Settings {
 
             // At one time in System, then Global, but now back in Secure
             MOVED_TO_SECURE.add(Secure.INSTALL_NON_MARKET_APPS);
+
+            MOVED_TO_SECURE.add(Secure.VOLUME_LINK_NOTIFICATION);
         }
 
         private static final HashSet<String> MOVED_TO_GLOBAL;
@@ -9356,6 +9358,14 @@ public final class Settings {
                 "packages_to_clear_data_before_full_restore";
 
         /**
+         * Boolean value whether to link ringtone and notification volume
+         * @hide
+         */
+        public static final String VOLUME_LINK_NOTIFICATION = "volume_link_notification";
+
+        private static final Validator VOLUME_LINK_NOTIFICATION_VALIDATOR = BOOLEAN_VALIDATOR;
+
+        /**
          * Whether to set a lower brightness level when enabling night mode
          * 0: Disabled
          * 1: Set the brightness to a very low value
@@ -9983,6 +9993,7 @@ public final class Settings {
             FLING_KEYBOARD_CURSORS,
             PULSE_AUTO_COLOR,
             SMARTBAR_DOUBLETAP_SLEEP,
+            VOLUME_LINK_NOTIFICATION,
         };
 
         /**
@@ -10186,6 +10197,7 @@ public final class Settings {
             VALIDATORS.put(FLING_KEYBOARD_CURSORS, FLING_KEYBOARD_CURSORS_VALIDATOR);
             VALIDATORS.put(PULSE_AUTO_COLOR, PULSE_AUTO_COLOR_VALIDATOR);
             VALIDATORS.put(SMARTBAR_DOUBLETAP_SLEEP, SMARTBAR_DOUBLETAP_SLEEP_VALIDATOR);
+            VALIDATORS.put(VOLUME_LINK_NOTIFICATION, VOLUME_LINK_NOTIFICATION_VALIDATOR);
         }
 
         /**
