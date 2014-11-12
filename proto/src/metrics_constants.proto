@@ -6436,5 +6436,6 @@ message MetricsEvent {
 
     // PixelDust custom constants
     PIXELDUST = 2000;
+    FEATURE_PREFERENCES = 9001;
   }
 }

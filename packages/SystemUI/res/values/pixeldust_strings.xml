@@ -167,4 +167,9 @@
     <string name="show_fourg_title">Show 4G instead of LTE</string>
     <string name="show_fourg_summary">Replaces LTE statusbar indicators with 4G</string>
 
+    <!-- OnTheSpot: Action denial button text. [CHAR LIMIT=NONE] -->
+    <string name="on_the_spot_deny">NO THANKS</string>
+    <!-- OnTheSpot: Action confirmation button text. [CHAR LIMIT=NONE] -->
+    <string name="on_the_spot_confirm">OKAY</string>
+
 </resources>
