@@ -15,19 +15,11 @@
      limitations under the License.
 -->
 <resources>
-  <!-- Package Manager -->
-  <java-symbol type="array" name="config_disabledComponents" />
-  <java-symbol type="array" name="config_forceEnabledComponents" />
-
-  <!-- Vendor mismatched fingerprint warning -->
-  <java-symbol type="string" name="system_error_vendorprint" />
-
-  <java-symbol type="array" name="config_blockPackagesSensorDrain" />
-
-  <java-symbol type="array" name="config_vendorPlatformSignatures" />
-
-  <!-- Notification light mappings -->
-  <java-symbol type="array" name="notification_light_package_mapping" />
-  <java-symbol type="integer" name="config_deviceLightCapabilities" />
-
+    <!-- Do not translate. Defines the mapping of notification package names
+         from the actual triggering package to the user selectable package.
+         E.g. GTalk notifications come via Google Services Framework
+         Format: [triggering package]|[user package] -->
+    <string-array name="notification_light_package_mapping" translatable="false">
+        <item>com.google.android.gsf|com.google.android.talk</item>
+    </string-array>
 </resources>
