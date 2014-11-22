@@ -9384,11 +9384,17 @@ public final class Settings {
         private static final Validator NAVIGATION_BAR_WIDTH_VALIDATOR =
                 ANY_INTEGER_VALIDATOR;
 
-         /**
-          * Whether to allow killing of the foreground app by long-pressing the Back button
-          * @hide
-          */
-         public static final String KILL_APP_LONGPRESS_BACK = "kill_app_longpress_back";
+        /**
+         * Whether to allow killing of the foreground app by long-pressing the Back button
+         * @hide
+         */
+        public static final String KILL_APP_LONGPRESS_BACK = "kill_app_longpress_back";
+
+        /**
+         * The delay when killing the app on long press takes place
+         * @hide
+         */
+        public static final String LONG_PRESS_KILL_DELAY = "long_press_kill_delay";
 
         /**
          * Navigation bar mode
