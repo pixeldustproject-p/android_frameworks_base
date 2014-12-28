@@ -279,4 +279,17 @@
     <string name="quick_settings_locale_label">Sprache</string>
     <string name="quick_settings_locale_more_locales_toast">Bitte konfigurieren Sie mehrere Sprachen, um die Umschaltfunktion zu verwenden</string>
 
+  <!-- Screenrecord Notification Ticker -->
+  <string name="screenrecord_notif_ticker">Bildschirminhalt wird aufgezeichnet</string>
+  <!-- Screenrecord notification title -->
+  <string name="screenrecord_notif_title">Bildschirmaufnahme läuft</string>
+  <!-- Screenrecord notification action: Stop -->
+  <string name="screenrecord_notif_stop">Stopp</string>
+  <!-- Screenrecord notification action: show/hide pointer -->
+  <string name="screenrecord_notif_pointer_on">Zeiger einblenden</string>
+  <string name="screenrecord_notif_pointer_off">Zeiger ausblenden</string>
+  <!-- Screen record notification error title -->
+  <string name="screenrecord_notif_error">Bildschirmaufnahme nicht möglich</string>
+  <string name="notification_channel_screenrecord">Bildschirmaufnahmen</string>
+
 </resources>
