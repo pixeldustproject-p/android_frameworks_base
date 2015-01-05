@@ -2280,24 +2280,30 @@ public final class ActiveServices {
             return;
         }
         try {
-            if(SERVICE_RESCHEDULE) {
+            if (SERVICE_RESCHEDULE) {
                 boolean shouldDelay = false;
                 ActivityRecord top_rc = null;
                 ActivityStack stack = mAm.getFocusedStack();
-                if(stack != null) {
+
+                if (stack != null) {
                     top_rc = stack.topRunningActivityLocked();
                 }
-                if(top_rc != null) {
-                    if(!top_rc.nowVisible && !r.shortName.contains(top_rc.packageName)) {
+
+                final boolean isPersistent = (r.serviceInfo.applicationInfo.flags &
+                        ApplicationInfo.FLAG_PERSISTENT) != 0;
+                if (top_rc != null) {
+                    if (top_rc.launching && !r.shortName.contains(top_rc.packageName)
+                            && !isPersistent) {
                         shouldDelay = true;
                     }
                 }
-                if(!shouldDelay) {
-                    bringUpServiceLocked(r, r.intent.getIntent().getFlags(), r.createdFromFg, true, false);
+                if (!shouldDelay) {
+                    bringUpServiceLocked(r, r.intent.getIntent().getFlags(), r.createdFromFg,
+                            true, false);
                 } else {
                     if (DEBUG_DELAYED_SERVICE) {
                         Slog.v(TAG, "Reschedule service restart due to app launch"
-                              +" r.shortName "+r.shortName+" r.app = "+r.app);
+                                + " r.shortName " + r.shortName + " r.app = " + r.app);
                     }
                     r.resetRestartCounter();
                     scheduleServiceRestartLocked(r, true);
@@ -2546,9 +2552,9 @@ public final class ActiveServices {
                     app.services.remove(r);
                     r.app = null;
                     if (SERVICE_RESCHEDULE && DEBUG_DELAYED_SERVICE) {
-                    Slog.w(TAG, " Failed to create Service !!!! ."
-                           +"This will introduce huge delay...  "
-                           +r.shortName + " in " + r.restartDelay + "ms");
+                        Slog.w(TAG, "Failed to create Service !!!"
+                                + " This will introduce huge delay... "
+                                + r.shortName + " in " + r.restartDelay + "ms");
                     }
                 }
 
