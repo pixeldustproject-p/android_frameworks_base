@@ -63,4 +63,7 @@
   <!-- [CHAR LIMIT=NONE] Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_toggleNavigationEditor">Erlaubt es einer App, die Kontrolle über den Navigationsleisten-Editor zu übernehmen.</string>
 
+  <!-- back kill -->
+  <string name="app_killed_message">Anwendung beendet</string>
+
 </resources>
