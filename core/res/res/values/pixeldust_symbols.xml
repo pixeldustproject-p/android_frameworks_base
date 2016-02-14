@@ -224,4 +224,7 @@
   <java-symbol type="anim" name="inv_app_in" />
   <java-symbol type="anim" name="inv_app_out" />
 
+  <!-- Hardware Key Binding -->
+  <java-symbol type="integer" name="config_deviceHardwareKeys" />
+
 </resources>
