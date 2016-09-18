@@ -47,4 +47,10 @@
     <string name="lte_on">LTE EIN</string>
     <string name="lte_off">LTE AUS</string>
 
+    <!-- Sound QS Tile -->
+    <string name="quick_settings_sound_label">Telefon-Ton</string>
+    <string name="quick_settings_sound_ring">Klingelton</string>
+    <string name="quick_settings_sound_vibrate">Vibrieren</string>
+    <string name="quick_settings_sound_dnd">Nicht stören</string>
+
 </resources>
