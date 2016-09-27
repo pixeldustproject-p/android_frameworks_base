@@ -25,6 +25,7 @@ import com.android.systemui.plugins.qs.QSTileView;
 import com.android.systemui.qs.external.CustomTile;
 import com.android.systemui.qs.tiles.AirplaneModeTile;
 import com.android.systemui.qs.tiles.BatterySaverTile;
+import com.android.systemui.qs.tiles.PDSettingsTile;
 import com.android.systemui.qs.tiles.BluetoothTile;
 import com.android.systemui.qs.tiles.CastTile;
 import com.android.systemui.qs.tiles.CellularTile;
@@ -104,6 +105,8 @@ public class QSFactoryImpl implements QSFactory {
                 return new LteTile(mHost);
             case "sound":
                 return new SoundTile(mHost);
+            case "pixeldust_settings":
+                return new PDSettingsTile(mHost);
         }
 
         // Intent tiles.
