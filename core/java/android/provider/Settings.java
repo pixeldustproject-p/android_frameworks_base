@@ -4248,6 +4248,12 @@ public final class Settings {
          */
 
         /**
+         * Wether pocket judge is enabled or not
+         * @hide
+         */
+        public static final String POCKET_JUDGE = "pocket_judge";
+
+        /**
          * Whether to show the negociated charger current in the lockscreen
          * @hide
          */
