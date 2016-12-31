@@ -106,4 +106,5 @@ interface IStatusBarService
      * Pixeldust extensions
      */
     void toggleCameraFlash();
+    void restartUI();
 }
