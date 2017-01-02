@@ -848,21 +848,22 @@ Navigator.OnVerticalChangedListener, KeyguardMonitor.Callback, NotificationMedia
 
         ButtonDispatcher recentsButton = mNavigationBarView.getRecentsButton();
         if (recentsButton != null) {
-            recentsButton.setOnClickListener(this::onRecentsClick);
-            recentsButton.setOnTouchListener(this::onRecentsTouch);
-            recentsButton.setLongClickable(true);
-            recentsButton.setOnLongClickListener(this::onLongPressBackRecents);
+            //recentsButton.setOnClickListener(this::onRecentsClick);
+            //recentsButton.setOnTouchListener(this::onRecentsTouch);
+            recentsButton.setLongClickable(false);
+            //recentsButton.setOnLongClickListener(this::onLongPressBackRecents);
         }
 
         ButtonDispatcher backButton = mNavigationBarView.getBackButton();
         if (backButton != null) {
-            backButton.setLongClickable(true);
+            backButton.setLongClickable(false);
         }
 
         ButtonDispatcher homeButton = mNavigationBarView.getHomeButton();
         if (homeButton != null) {
-            homeButton.setOnTouchListener(this::onHomeTouch);
-            homeButton.setOnLongClickListener(this::onHomeLongClick);
+            homeButton.setLongClickable(false);
+            //homeButton.setOnTouchListener(this::onHomeTouch);
+            //homeButton.setOnLongClickListener(this::onHomeLongClick);
         }
 
         ButtonDispatcher accessibilityButton = mNavigationBarView.getAccessibilityButton();
