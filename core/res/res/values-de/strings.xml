@@ -1874,6 +1874,10 @@
     <string name="screenshot_edit" msgid="7867478911006447565">"Bearbeiten"</string>
     <string name="volume_dialog_ringer_guidance_vibrate" msgid="8902050240801159042">"Anrufe und Benachrichtigungen per Vibrationsalarm"</string>
     <string name="volume_dialog_ringer_guidance_silent" msgid="2128975224280276122">"Anrufe und Benachrichtigungen stummgeschaltet"</string>
+
+    <!-- Informative text shown when the device is in One handed mode. It also explains how to exit the mode. -->
+    <string name="onehand_guide" xliff:restype="x-GENERIC/FULLSCREEN/TEXT">Tippen Sie auf den leeren Bereich, um den Einhandmodus zu beenden</string>
+
     <string name="notification_channel_system_changes" msgid="5072715579030948646">"Systemänderungen"</string>
     <string name="notification_channel_do_not_disturb" msgid="6766940333105743037">"Bitte nicht stören"</string>
     <string name="zen_upgrade_notification_visd_title" msgid="3288313883409759733">"Neu: Durch \"Bitte nicht stören\" werden Benachrichtigungen nicht mehr angezeigt"</string>
