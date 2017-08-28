@@ -40,4 +40,6 @@
     <string name="menu_ime_always_show">Menü- / Tastatur-Umschalter (immer anzeigen)</string>
     <string name="search">Suche</string>
 
+    <string name="global_action_restart_advanced">Erweiterter Neustart</string>
+
 </resources>
