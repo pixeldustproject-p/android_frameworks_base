@@ -62,4 +62,12 @@
     <!-- [CHAR LIMIT=NONE] Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
     <string name="permdesc_toggleNavigationEditor">Allows an application to control the navigation bar editor.</string>
 
+    <!-- Power menu -->
+    <string name="reboot_to_recovery_title">Recovery</string>
+    <string name="reboot_to_recovery_message">Restarting to recovery</string>
+    <string name="reboot_to_bootloader_title">Bootloader</string>
+    <string name="reboot_to_bootloader_message">Restarting to bootloader</string>
+    <string name="reboot_title">Restart</string>
+    <string name="reboot_message">Restarting system</string>
+
 </resources>
