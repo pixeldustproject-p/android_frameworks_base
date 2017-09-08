@@ -53,4 +53,7 @@
     <string name="quick_settings_sound_vibrate">Vibrieren</string>
     <string name="quick_settings_sound_dnd">Nicht stören</string>
 
+    <!-- Statusbar Tuner -->
+    <string name="statusbar_items_title">Elemente der Statusleiste</string>
+
 </resources>
