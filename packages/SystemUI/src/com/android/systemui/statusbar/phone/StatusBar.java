@@ -2151,6 +2151,10 @@ public class StatusBar extends SystemUI implements DemoMode,
             return false;
         }
 
+        if (mEntryManager.shouldSkipHeadsUp(sbn)) {
+            return false;
+        }
+
         if (sbn.getNotification().fullScreenIntent != null) {
             if (mAccessibilityManager.isTouchExplorationEnabled()) {
                 if (DEBUG) Log.d(TAG, "No peeking: accessible fullscreen: " + sbn.getKey());
@@ -5510,6 +5514,9 @@ public class StatusBar extends SystemUI implements DemoMode,
             if (uri.equals(Settings.Secure.getUriFor(
                     Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS))) {
                 setFpToDismissNotifications();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.LESS_BORING_HEADS_UP))) {
+                setUseLessBoringHeadsUp();
             }
         }
 
@@ -5523,6 +5530,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                     UserHandle.USER_CURRENT) != 0;
             TelephonyIcons.updateIcons(USE_OLD_MOBILETYPE);
             setFpToDismissNotifications();
+            setUseLessBoringHeadsUp();
         }
 
     }
@@ -5531,6 +5539,13 @@ public class StatusBar extends SystemUI implements DemoMode,
         mFpDismissNotifications = Settings.Secure.getIntForUser(mContext.getContentResolver(),
                 Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS, 0,
                 UserHandle.USER_CURRENT) == 1;
+    }
+
+    private void setUseLessBoringHeadsUp() {
+        boolean lessBoringHeadsUp = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.LESS_BORING_HEADS_UP, 0,
+                UserHandle.USER_CURRENT) == 1;
+        mEntryManager.setUseLessBoringHeadsUp(lessBoringHeadsUp);
     }
 
     private final BroadcastReceiver mBannerActionBroadcastReceiver = new BroadcastReceiver() {
