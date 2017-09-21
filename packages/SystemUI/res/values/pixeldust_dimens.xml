@@ -34,4 +34,7 @@
     <!-- Height of the status bar header bar -->
     <dimen name="status_bar_header_height">130dp</dimen>
 
+    <!-- QS tile height -->
+    <dimen name="qs_tile_height_wo_label">48dp</dimen>
+
 </resources>
