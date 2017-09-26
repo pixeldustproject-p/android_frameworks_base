@@ -27,6 +27,7 @@ import com.android.systemui.qs.tiles.AirplaneModeTile;
 import com.android.systemui.qs.tiles.AlwaysOnDisplayTile;
 import com.android.systemui.qs.tiles.AmbientDisplayTile;
 import com.android.systemui.qs.tiles.AmbientPlayTile;
+import com.android.systemui.qs.tiles.ANBITile;
 import com.android.systemui.qs.tiles.BatterySaverTile;
 import com.android.systemui.qs.tiles.PDSettingsTile;
 import com.android.systemui.qs.tiles.BluetoothTile;
@@ -155,6 +156,8 @@ public class QSFactoryImpl implements QSFactory {
                 return new AmbientPlayTile(mHost);
             case "locale":
                 return new LocaleTile(mHost);
+            case "anbi":
+                return new ANBITile(mHost);
         }
 
         // Intent tiles.
