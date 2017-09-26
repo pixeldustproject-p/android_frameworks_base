@@ -4377,6 +4377,13 @@ public final class Settings {
         public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
 
         /**
+         * Indicates whether ANBI (Accidental navigation button interaction) is enabled.
+         *
+         * @hide
+         */
+        public static final String ANBI_ENABLED_OPTION = "anbi_enabled_option";
+
+        /**
          * AM/PM Style for clock options
          * 0 - Normal AM/PM
          * 1 - Small AM/PM
