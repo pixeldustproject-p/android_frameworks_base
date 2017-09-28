@@ -280,4 +280,8 @@
     <string name="accessibility_dpad_left">Cursor links</string>
     <string name="accessibility_dpad_right">Cursor rechts</string>
 
+    <!-- Language toggle tile -->
+    <string name="quick_settings_locale_label">Sprache</string>
+    <string name="quick_settings_locale_more_locales_toast">Bitte konfigurieren Sie mehrere Sprachen, um die Umschaltfunktion zu verwenden</string>
+
 </resources>
