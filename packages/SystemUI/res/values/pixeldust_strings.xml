@@ -92,4 +92,7 @@
     <!-- Announcement made when ambient display changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
     <string name="accessibility_quick_settings_always_on_display_changed_on">Always on display turned on.</string>
 
+    <!-- Screenshot -->
+    <string name="quick_settings_screenshot_label">Screenshot</string>
+
 </resources>
