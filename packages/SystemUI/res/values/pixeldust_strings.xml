@@ -331,8 +331,9 @@
     <string name="ambientmusic_songinfo">%s by %s</string>
 
     <!-- Power menu -->
-    <string name="global_action_restart_advanced">Advanced restart</string>
+    <string name="global_action_restart_advanced">Advanced</string>
     <string name="global_action_restart_recovery">Recovery</string>
     <string name="global_action_restart_bootloader">Bootloader</string>
+    <string name="global_action_restart_ui">SystemUI</string>
 
 </resources>
