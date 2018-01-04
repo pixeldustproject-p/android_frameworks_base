@@ -61,4 +61,8 @@
     <bool name="config_haveHigherAspectRatioScreen">false</bool>
     <item name="config_screenAspectRatio" format="float" type="dimen">2.1</item>
 
+    <!-- Whether the device supports Smart Pixels
+         Disable if it doesn't -->
+    <bool name="config_enableSmartPixels">true</bool>
+
 </resources>
