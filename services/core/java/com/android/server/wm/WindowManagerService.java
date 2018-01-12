@@ -7710,4 +7710,9 @@ public class WindowManagerService extends IWindowManager.Stub
             scheduleAnimationLocked();
         }
     }
+
+    @Override
+    public void screenRecordAction(int mode) {
+        mPolicy.screenRecordAction(mode);
+    }
 }
