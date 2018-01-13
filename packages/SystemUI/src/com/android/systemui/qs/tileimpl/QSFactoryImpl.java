@@ -24,6 +24,7 @@ import com.android.systemui.plugins.qs.*;
 import com.android.systemui.plugins.qs.QSTileView;
 import com.android.systemui.qs.external.CustomTile;
 import com.android.systemui.qs.tiles.AirplaneModeTile;
+import com.android.systemui.qs.tiles.AlwaysOnDisplayTile;
 import com.android.systemui.qs.tiles.BatterySaverTile;
 import com.android.systemui.qs.tiles.PDSettingsTile;
 import com.android.systemui.qs.tiles.BluetoothTile;
@@ -113,6 +114,8 @@ public class QSFactoryImpl implements QSFactory {
                 return new RebootTile(mHost);
             case "smartpixels":
                 return new SmartPixelsTile(mHost);
+            case "always_on_display":
+                return new AlwaysOnDisplayTile(mHost);
         }
 
         // Intent tiles.
