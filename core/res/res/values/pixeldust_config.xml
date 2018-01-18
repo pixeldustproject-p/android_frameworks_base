@@ -175,4 +175,6 @@
     <!-- Whether auto face unlock is enabled by default -->
     <bool name="config_face_unlock_enabled_by_default">false</bool>
 
+    <bool name="config_canForceDozeNotifications">true</bool>
+
 </resources>
