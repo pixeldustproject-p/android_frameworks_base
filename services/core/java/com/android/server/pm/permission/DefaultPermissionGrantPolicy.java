@@ -956,6 +956,13 @@ public final class DefaultPermissionGrantPolicy {
             grantRuntimePermissions(googlecalendarPackage, CONTACTS_PERMISSIONS, true, userId);
             grantRuntimePermissions(googlecalendarPackage, PHONE_PERMISSIONS, userId);
         }
+        // Google dialer
+        PackageParser.Package googledialerPackage = getSystemPackage("com.google.android.dialer");
+        if (googledialerPackage != null && doesPackageSupportRuntimePermissions(googledialerPackage)) {
+            grantRuntimePermissions(googledialerPackage, PHONE_PERMISSIONS, true, userId);
+            grantRuntimePermissions(googledialerPackage, CONTACTS_PERMISSIONS, true, userId);
+            grantRuntimePermissions(googledialerPackage, SMS_PERMISSIONS, userId);
+        }
 
         if (mPermissionGrantedCallback != null) {
             mPermissionGrantedCallback.onDefaultRuntimePermissionsGranted(userId);
