@@ -9861,6 +9861,13 @@ public final class Settings {
                 BOOLEAN_VALIDATOR;
 
         /**
+         * Pulse accent color
+         *
+         * @hide
+         */
+        public static final String PULSE_ACCENT_COLOR_ENABLED = "pulse_accent_color_enabled";
+
+        /**
          * Fling pulse lavalamp animation speed
          *
          * @hide
