@@ -363,16 +363,15 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
     private ObjectAnimator mColorFadeOffAnimator;
     private RampAnimator<DisplayPowerState> mScreenBrightnessRampAnimator;
 
-<<<<<<< HEAD
     final ContentResolver cr;
-=======
+
     // Screen-off animation
     private int mScreenOffAnimation;
     private boolean mScreenOnAnimation;
     static final int SCREEN_OFF_SIMPLE_FADE = 0;
+    static final int SCREEN_OFF_COLOR_FADE = 1;
     static final int SCREEN_OFF_CRT = 2;
     static final int SCREEN_OFF_SCALE = 3;
->>>>>>> 19483c2a543... base: screen off animation config [1/2]
 
     /**
      * Creates the display power controller.
@@ -613,11 +612,15 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
         switch (mScreenOffAnimation) {
             case SCREEN_OFF_SIMPLE_FADE:
                 if (displayState == Display.STATE_OFF) {
-                    return mColorFadeFadesConfig ? ScreenStateAnimator.MODE_FADE
-                        : ScreenStateAnimator.MODE_COOL_DOWN;
+                    return ScreenStateAnimator.MODE_FADE;
                 } else {
-                    return mColorFadeFadesConfig ? ScreenStateAnimator.MODE_FADE
-                        : ScreenStateAnimator.MODE_WARM_UP;
+                    return ScreenStateAnimator.MODE_FADE;
+                }
+            case SCREEN_OFF_COLOR_FADE:
+                if (displayState == Display.STATE_OFF) {
+                    return ScreenStateAnimator.MODE_COOL_DOWN;
+                } else {
+                    return ScreenStateAnimator.MODE_WARM_UP;
                 }
             case SCREEN_OFF_CRT:
                 if (displayState == Display.STATE_OFF) {
@@ -643,25 +646,25 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
         final ContentObserver observer = new ContentObserver(mHandler) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
-                mScreenOffAnimation = Settings.Global.getInt(cr,
-                        Settings.Global.SCREEN_OFF_ANIMATION, SCREEN_OFF_SIMPLE_FADE);
-                mScreenOnAnimation = Settings.Global.getInt(cr,
-                        Settings.Global.SCREEN_ON_ANIMATION, 0) != 0;
+                mScreenOffAnimation = Settings.System.getInt(cr,
+                        Settings.System.SCREEN_OFF_ANIMATION, SCREEN_OFF_SIMPLE_FADE);
+                mScreenOnAnimation = Settings.System.getInt(cr,
+                        Settings.System.SCREEN_ON_ANIMATION, 0) != 0;
                 if (mPowerState != null) {
                     mPowerState.setScreenStateAnimator(mScreenOffAnimation);
                 }
             }
         };
-        cr.registerContentObserver(Settings.Global.getUriFor(
-                Settings.Global.SCREEN_OFF_ANIMATION),
+        cr.registerContentObserver(Settings.System.getUriFor(
+                Settings.System.SCREEN_OFF_ANIMATION),
                 false, observer, UserHandle.USER_ALL);
-        cr.registerContentObserver(Settings.Global.getUriFor(
-                Settings.Global.SCREEN_ON_ANIMATION),
+        cr.registerContentObserver(Settings.System.getUriFor(
+                Settings.System.SCREEN_ON_ANIMATION),
                 false, observer, UserHandle.USER_ALL);
-        mScreenOffAnimation = Settings.Global.getInt(cr,
-                Settings.Global.SCREEN_OFF_ANIMATION, SCREEN_OFF_SIMPLE_FADE);
-        mScreenOnAnimation = Settings.Global.getInt(cr,
-                Settings.Global.SCREEN_ON_ANIMATION, 0) != 0;
+        mScreenOffAnimation = Settings.System.getInt(cr,
+                Settings.System.SCREEN_OFF_ANIMATION, SCREEN_OFF_SIMPLE_FADE);
+        mScreenOnAnimation = Settings.System.getInt(cr,
+                Settings.System.SCREEN_ON_ANIMATION, 0) != 0;
 
         mPowerState = new DisplayPowerState(mBlanker, mScreenOffAnimation);
 

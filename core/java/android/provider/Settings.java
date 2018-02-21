@@ -4564,6 +4564,25 @@ public final class Settings {
         /** @hide */
         private static final Validator QS_TILE_TITLE_VISIBILITY_VALIDATOR = BOOLEAN_VALIDATOR;
 
+        
+        /**
+         * Defines the screen-off animation to display
+         * @hide
+         */
+        public static final String SCREEN_OFF_ANIMATION = "screen_off_animation";
+
+        /**
+         * Whether to show a screen-on animation
+         * @hide
+         */
+        public static final String SCREEN_ON_ANIMATION = "screen_on_animation";
+
+        /**
+         * Disabled Transition animations of the android system
+         * @hide
+         */
+        public static final String DISABLE_TRANSITION_ANIMATIONS = "disable_transition_animations";
+
         /**
          * @hide
          */
@@ -12807,18 +12826,6 @@ public final class Settings {
          */
         public static final String LOCATION_SETTINGS_LINK_TO_PERMISSIONS_ENABLED =
                 "location_settings_link_to_permissions_enabled";
-
-        /**
-         * Defines the screen-off animation to display
-         * @hide
-         */
-        public static final String SCREEN_OFF_ANIMATION = "screen_off_animation";
-
-        /**
-         * Whether to show a screen-on animation
-         * @hide
-         */
-        public static final String SCREEN_ON_ANIMATION = "screen_on_animation";
 
         /**
          * Flag to set the waiting time for euicc factory reset inside System > Settings
