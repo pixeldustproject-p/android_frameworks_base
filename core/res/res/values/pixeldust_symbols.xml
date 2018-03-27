@@ -66,4 +66,7 @@
   <!-- Notification info -->
   <java-symbol type="color" name="notification_info_button_text" />
 
+  <!-- Settings icon tint color -->
+  <java-symbol type="color" name="settings_icon_tint_color" />
+
 </resources>
