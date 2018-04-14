@@ -39,6 +39,7 @@
     <string name="navbar_editor_summary">Configure navigaton bar</string>
     <string name="menu_ime_always_show">Menu / Keyboard Switcher (always show)</string>
     <string name="search">Search</string>
+    <string name="nav_bar_layout_inverse">Swap back and recents</string>
 
     <string name="global_action_restart_advanced">Advanced reboot</string>
 
