@@ -16,6 +16,7 @@
 package com.android.systemui.ambient.play;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -36,6 +37,8 @@ public class AmbientIndicationContainer extends AutoReinflateContainer {
 
     private String mSong;
     private String mArtist;
+
+    private static final String FONT_FAMILY = "sans-serif-light";
 
     public AmbientIndicationContainer(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -63,10 +66,12 @@ public class AmbientIndicationContainer extends AutoReinflateContainer {
     }
 
     public void updateAmbientIndicationView(View view) {
+        Typeface tf = Typeface.create(FONT_FAMILY, Typeface.NORMAL);
         mAmbientIndication = findViewById(R.id.ambient_indication);
         mText = (TextView) findViewById(R.id.ambient_indication_text);
         mIcon = (ImageView) findViewById(R.id.ambient_indication_icon);
         setIndication(mSong, mArtist);
+        mText.setTypeface(tf);
     }
 
     public void setIndication(String song, String artist) {
