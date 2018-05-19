@@ -120,4 +120,9 @@
     <string name="caffeine_info_title">What is this?</string>
     <string name="caffeine_info_message">Caffeine tile is a simple tile that you could switch on to keep your screen on.\n\nPlease note that the tile\'s state will reset itself after turning the screen off.</string>
 
+    <!-- AmbientPlay: The contents of the displayed recognition. -->
+    <string name="ambient_recognition_notification">Now Playing</string>
+    <string name="ambient_recognition_notification_channel">Recognized Music Notifications</string>
+    <string name="ambient_recognition_information">%1$s by %2$s</string>
+
 </resources>
