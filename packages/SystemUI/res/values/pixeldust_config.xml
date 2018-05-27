@@ -61,4 +61,7 @@
         <item>com.google.android.systemui.GoogleServices</item>
     </string-array>
 
+    <!-- Config to enable/diaable qs tile tinting -->
+    <bool name="config_enable_qs_tile_tinting">false</bool>
+
 </resources>
