@@ -297,4 +297,7 @@
     <!-- Screenshot QS tile -->
     <string name="quick_settings_screenrecord_label">Bildschirmaufnahme</string>
 
+    <!-- Ambient Display Pixel-Like string -->
+    <string name="ambientmusic_songinfo">%s von %s</string>
+
 </resources>
