@@ -126,7 +126,7 @@ public class StatusBarWindowView extends FrameLayout {
         mTransparentSrcPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         mFalsingManager = FalsingManager.getInstance(context);
         mStatusBarHeaderHeight = context
-                .getResources().getDimensionPixelSize(R.dimen.status_bar_header_height);
+                .getResources().getDimensionPixelSize(R.dimen.status_bar_height);
         mSettingsObserver = new SettingsObserver(mHandler);
         mDoubleTapHelper = new DoubleTapHelper(this, active -> {}, () -> {
             mService.wakeUpIfDozing(SystemClock.uptimeMillis(), this);
