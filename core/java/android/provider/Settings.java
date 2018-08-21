@@ -9348,6 +9348,15 @@ public final class Settings {
         public static final String QS_SHOW_BRIGHTNESS_SLIDER = "qs_show_brightness_slider";
 
         /**
+         * Add or remove software navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_VISIBLE = "navigation_bar_visible";
+
+        private static final Validator NAVIGATION_BAR_VISIBLE_VALIDATOR = BOOLEAN_VALIDATOR;
+
+
+        /**
          * This are the settings to be backed up.
          *
          * NOTE: Settings are backed up and restored in the order they appear
@@ -9449,7 +9458,8 @@ public final class Settings {
             MANUAL_RINGER_TOGGLE_COUNT,
             HUSH_GESTURE_USED,
             TORCH_POWER_BUTTON_GESTURE,
-            FP_SWIPE_TO_DISMISS_NOTIFICATIONS
+            FP_SWIPE_TO_DISMISS_NOTIFICATIONS,
+            NAVIGATION_BAR_VISIBLE
         };
 
         /**
@@ -9599,6 +9609,7 @@ public final class Settings {
             VALIDATORS.put(TORCH_POWER_BUTTON_GESTURE, TORCH_POWER_BUTTON_GESTURE_VALIDATOR);
             VALIDATORS.put(LOCK_POWER_MENU_DISABLED, LOCK_POWER_MENU_DISABLED_VALIDATOR);
             VALIDATORS.put(FP_SWIPE_TO_DISMISS_NOTIFICATIONS, FP_SWIPE_TO_DISMISS_NOTIFICATIONS_VALIDATOR);
+            VALIDATORS.put(NAVIGATION_BAR_VISIBLE, NAVIGATION_BAR_VISIBLE_VALIDATOR);
         }
 
         /**
