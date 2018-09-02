@@ -29,7 +29,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.service.quicksettings.Tile;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -106,11 +105,11 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
                 R.layout.qs_paged_tile_layout, this, false);
         mTileLayout.setListening(mListening);
         addView((View) mTileLayout);
-        updateSettings();
 
         mPanelPageIndicator = (PageIndicator) LayoutInflater.from(context).inflate(
                 R.layout.qs_page_indicator, this, false);
         addView(mPanelPageIndicator);
+        updateSettings();
 
         ((PagedTileLayout) mTileLayout).setPageIndicator(mPanelPageIndicator);
         mQsTileRevealController = new QSTileRevealController(mContext, this,
@@ -133,7 +132,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
         mDivider.setBackgroundColor(Utils.applyAlpha(mDivider.getAlpha(),
                 getColorForState(mContext, Tile.STATE_ACTIVE)));
         addView(mDivider);
-        updateSettings();
     }
 
     public View getDivider() {
@@ -664,7 +662,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
 
         boolean updateResources();
         void updateSettings();
-        int getNumColumns();
         boolean isShowTitles();
 
         void setListening(boolean listening);
@@ -674,7 +671,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
 
     private void configureTile(QSTile t, QSTileView v) {
         if (mTileLayout != null) {
-            v.setHideExpand(mTileLayout.getNumColumns() > 4);
             v.setHideLabel(!mTileLayout.isShowTitles());
             if (t.isDualTarget()) {
                 if (!mTileLayout.isShowTitles()) {
