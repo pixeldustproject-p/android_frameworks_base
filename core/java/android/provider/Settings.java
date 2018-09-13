@@ -4337,6 +4337,13 @@ public final class Settings {
         public static final String STATUSBAR_CLOCK_STYLE = "statusbar_clock_style";
 
         /** @hide */
+        public static final String USE_OLD_MOBILETYPE = "use_old_mobiletype";
+
+        /** @hide */
+        private static final Validator USE_OLD_MOBILETYPE_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /** @hide */
         public static final Validator STATUSBAR_CLOCK_STYLE_VALIDATOR =
                 new SettingsValidators.InclusiveIntegerRangeValidator(0, 2);
 
@@ -4715,7 +4722,8 @@ public final class Settings {
             QS_LAYOUT_ROWS,
             QS_QUICKBAR_COLUMNS,
             QS_LAYOUT_ROWS_LANDSCAPE,
-            QS_PANEL_BG_ALPHA
+            QS_PANEL_BG_ALPHA,
+            USE_OLD_MOBILETYPE
         };
 
         /**
@@ -4867,6 +4875,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(QS_LAYOUT_ROWS_LANDSCAPE);
             PRIVATE_SETTINGS.add(QS_PANEL_BG_ALPHA);
             PRIVATE_SETTINGS.add(SHOW_FOURG);
+            PRIVATE_SETTINGS.add(USE_OLD_MOBILETYPE);
         }
 
         /**
@@ -4978,6 +4987,7 @@ public final class Settings {
             VALIDATORS.put(QS_QUICKBAR_COLUMNS, QS_QUICKBAR_COLUMNS_VALIDATOR);
             VALIDATORS.put(QS_LAYOUT_ROWS_LANDSCAPE, QS_LAYOUT_ROWS_LANDSCAPE_VALIDATOR);
             VALIDATORS.put(QS_PANEL_BG_ALPHA, QS_PANEL_BG_ALPHA_VALIDATOR);
+            VALIDATORS.put(USE_OLD_MOBILETYPE, USE_OLD_MOBILETYPE_VALIDATOR);
         }
 
         /**
