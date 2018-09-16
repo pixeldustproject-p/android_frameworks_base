@@ -65,4 +65,8 @@
   <!-- [CHAR LIMIT=NONE] Error when a package is installed but got the missing fonts.xml file, notifying the user why it isn't showing up. -->
   <string name="fontservice_incompatible_font">Das installierte Schriftartenpaket ist nicht kompatibel, da die Datei fonts.xml fehlt. Bitte an den Paketentwickler wenden, um Unterstützung zu erhalten.</string>
 
+  <string name="permlab_toggleNavigationEditor">Kontrolle über Navigationsleisten-Editor</string>
+  <!-- [CHAR LIMIT=NONE] Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permdesc_toggleNavigationEditor">Erlaubt es einer App, die Kontrolle über den Navigationsleisten-Editor zu übernehmen.</string>
+
 </resources>

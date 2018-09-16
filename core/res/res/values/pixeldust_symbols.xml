@@ -220,4 +220,8 @@
        1 - Fahrenheit -->
   <java-symbol type="integer" name="weather_lockscreen_default_unit" />
 
+  <!-- Smartnav anims -->
+  <java-symbol type="anim" name="inv_app_in" />
+  <java-symbol type="anim" name="inv_app_out" />
+
 </resources>
