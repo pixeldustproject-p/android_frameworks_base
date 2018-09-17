@@ -5161,6 +5161,22 @@ public final class Settings {
                 BOOLEAN_VALIDATOR;
 
         /**
+         * @hide
+         */
+        public static final String BURN_IN_PROTECTION = "burn_in_protection";
+
+        /** @hide */
+        public static final Validator BURN_IN_PROTECTION_VALIDATOR = BOOLEAN_VALIDATOR;
+
+        /**
+         * @hide
+         */
+        public static final String BURN_IN_PROTECTION_INTERVAL = "burn_in_protection_interval";
+
+        /** @hide */
+        private static final Validator BURN_IN_PROTECTION_INTERVAL_VALIDATOR = ANY_INTEGER_VALIDATOR;
+
+        /**
          * Whether Ambient Play is shown on the lockscreen
          *
          * @hide
@@ -5579,6 +5595,8 @@ public final class Settings {
             SLIM_MEM_TEXT_COLOR,
             SLIM_RECENTS_CORNER_RADIUS,
             SLIM_RECENTS_BLACKLIST_VALUES,
+            BURN_IN_PROTECTION,
+            BURN_IN_PROTECTION_INTERVAL,
         };
 
         /**
@@ -5765,6 +5783,8 @@ public final class Settings {
             PRIVATE_SETTINGS.add(SLIM_MEM_TEXT_COLOR);
             PRIVATE_SETTINGS.add(SLIM_RECENTS_CORNER_RADIUS);
             PRIVATE_SETTINGS.add(SLIM_RECENTS_BLACKLIST_VALUES);
+            PRIVATE_SETTINGS.add(BURN_IN_PROTECTION);
+            PRIVATE_SETTINGS.add(BURN_IN_PROTECTION_INTERVAL);
         }
 
         /**
@@ -5910,6 +5930,8 @@ public final class Settings {
             VALIDATORS.put(SLIM_MEM_TEXT_COLOR, SLIM_MEM_TEXT_COLOR_VALIDATOR);
             VALIDATORS.put(SLIM_RECENTS_CORNER_RADIUS, SLIM_RECENTS_CORNER_RADIUS_VALIDATOR);
             VALIDATORS.put(SLIM_RECENTS_BLACKLIST_VALUES, SLIM_RECENTS_BLACKLIST_VALUES_VALIDATOR);
+            VALIDATORS.put(BURN_IN_PROTECTION, BURN_IN_PROTECTION_VALIDATOR);
+            VALIDATORS.put(BURN_IN_PROTECTION_INTERVAL, BURN_IN_PROTECTION_INTERVAL_VALIDATOR);
         }
 
         /**

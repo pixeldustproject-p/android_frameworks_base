@@ -34,8 +34,4 @@
     <bool name="config_relocatePieOnRotation">true</bool> 
     <bool name="config_forcePieCentered">true</bool>
 
-    <!-- Burn in protection -->
-    <bool name="config_statusBarBurnInProtection">true</bool>
-    <integer name="config_shift_interval">60</integer>
-
 </resources>
