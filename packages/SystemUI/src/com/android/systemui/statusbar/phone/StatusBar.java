@@ -747,6 +747,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         mLockscreenUserManager.setUpWithPresenter(this, mEntryManager);
         mAmbientSettingsObserver.observe();
         mAmbientSettingsObserver.update();
+        mCustomSettingsObserver.observe();
+        mCustomSettingsObserver.update();
         mCommandQueue.disable(switches[0], switches[6], false /* animate */);
         setSystemUiVisibility(switches[1], switches[7], switches[8], 0xffffffff,
                 fullscreenStackBounds, dockedStackBounds);
@@ -5209,6 +5211,24 @@ public class StatusBar extends SystemUI implements DemoMode,
         return mVrMode;
     }
 
+    private CustomSettingsObserver mCustomSettingsObserver = new CustomSettingsObserver(mHandler);
+    private class CustomSettingsObserver extends ContentObserver {
+
+        CustomSettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+        }
+
+        public void update() {
+        }
+    }
+
     private SbSettingsObserver mSbSettingsObserver = new SbSettingsObserver(mHandler);
     private class SbSettingsObserver extends ContentObserver {
         SbSettingsObserver(Handler handler) {
@@ -5238,6 +5258,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                     Settings.System.HEADS_UP_BLACKLIST_VALUES);
             splitAndAddToArrayList(mBlacklist, blackString, "\\|");
         }
+
     }
 
     private final BroadcastReceiver mBannerActionBroadcastReceiver = new BroadcastReceiver() {
