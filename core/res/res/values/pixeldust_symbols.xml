@@ -165,4 +165,8 @@
   <java-symbol type="integer" name="config_LTE_antenna_bar_quantity_metric" />
   <java-symbol type="integer" name="config_LTE_RSRP_threshold_type" />
 
+  <!-- SystemUI Restart -->
+  <java-symbol type="string" name="systemui_restart_title" />
+  <java-symbol type="string" name="systemui_restart_message" />
+
 </resources>
