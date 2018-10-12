@@ -90,6 +90,9 @@
   <java-symbol type="color" name="notification_text_default_color" />
   <java-symbol type="color" name="notification_ambient_default_color" />
 
+  <!-- Ambient Recognition -->
+  <java-symbol type="bool" name="config_supportAmbientRecognition" />
+
   <java-symbol type="string" name="config_deviceKeyHandlerLib" />
   <java-symbol type="string" name="config_deviceKeyHandlerClass" />
 
