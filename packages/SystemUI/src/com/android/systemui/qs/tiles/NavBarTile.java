@@ -16,6 +16,7 @@
 
 package com.android.systemui.qs.tiles;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.provider.Settings;
 import android.service.quicksettings.Tile;
@@ -58,7 +59,8 @@ public class NavBarTile extends QSTileImpl<BooleanState> {
 
     @Override
     public Intent getLongClickIntent() {
-        return null;
+        return new Intent().setComponent(new ComponentName(
+            "com.android.settings", "com.android.settings.Settings$NavigationBarSettingsActivity"));
     }
 
     @Override
