@@ -31,6 +31,8 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.fingerprint.FingerprintManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.Manifest;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -173,6 +175,12 @@ public class PixeldustUtils {
         if (pm!= null) {
             pm.goToSleep(SystemClock.uptimeMillis());
         }
+    }
+
+	public static boolean deviceHasCompass(Context ctx) {
+        SensorManager sm = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
+        return sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null
+                && sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null;
     }
 
     public static boolean deviceHasFlashlight(Context ctx) {
