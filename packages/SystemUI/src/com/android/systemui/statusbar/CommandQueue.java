@@ -96,6 +96,7 @@ public class CommandQueue extends IStatusBar.Stub {
     private static final int MSG_TOGGLE_CAMERA_FLASH           = 47 << MSG_SHIFT;
     private static final int MSG_RESTART_UI                    = 48 << MSG_SHIFT;
     private static final int MSG_SET_AUTOROTATE_STATUS         = 49 << MSG_SHIFT;
+    private static final int MSG_TOGGLE_PIE_ORIENTATION        = 50 << MSG_SHIFT;
 
     public static final int FLAG_EXCLUDE_NONE = 0;
     public static final int FLAG_EXCLUDE_SEARCH_PANEL = 1 << 0;
@@ -171,6 +172,7 @@ public class CommandQueue extends IStatusBar.Stub {
         default void toggleCameraFlash() { }
         default void restartUI() { }
         default void setAutoRotate(boolean enabled) { }
+        default void toggleOrientationListener(boolean enable) { }
     }
 
     @VisibleForTesting
@@ -477,7 +479,6 @@ public class CommandQueue extends IStatusBar.Stub {
         }
     }
 
-
     @Override
     public void showGlobalActionsMenu() {
         synchronized (mLock) {
@@ -577,6 +578,13 @@ public class CommandQueue extends IStatusBar.Stub {
             mHandler.removeMessages(MSG_SET_AUTOROTATE_STATUS);
             mHandler.obtainMessage(MSG_SET_AUTOROTATE_STATUS,
                 enabled ? 1 : 0, 0, null).sendToTarget();
+        }
+    }
+
+    public void toggleOrientationListener(boolean enable) {
+        synchronized (mLock) {
+            mHandler.removeMessages(MSG_TOGGLE_PIE_ORIENTATION);
+            mHandler.obtainMessage(MSG_TOGGLE_PIE_ORIENTATION).sendToTarget();
         }
     }
 
@@ -839,6 +847,11 @@ public class CommandQueue extends IStatusBar.Stub {
                 case MSG_SET_AUTOROTATE_STATUS:
                     for (int i = 0; i < mCallbacks.size(); i++) {
                         mCallbacks.get(i).setAutoRotate(msg.arg1 != 0);
+                    }
+                    break;
+                case MSG_TOGGLE_PIE_ORIENTATION:
+                    for (int i = 0; i < mCallbacks.size(); i++) {
+                        mCallbacks.get(i).toggleOrientationListener(msg.arg1 != 0);
                     }
                     break;
             }
