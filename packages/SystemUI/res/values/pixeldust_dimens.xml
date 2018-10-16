@@ -40,4 +40,7 @@
     <!-- QS detail view scrolling -->
     <dimen name="qs_detail_item_height_twoline">72dp</dimen>
 
+    <dimen name="navbar_single_hand_mode_horizontal_threshhold">90dp</dimen>
+    <dimen name="navbar_single_hand_mode_vertical_threshhold">48dp</dimen>
+
 </resources>
