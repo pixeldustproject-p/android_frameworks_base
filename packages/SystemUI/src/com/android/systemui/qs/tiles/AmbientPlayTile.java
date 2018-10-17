@@ -21,14 +21,13 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.service.quicksettings.Tile;
-import com.android.systemui.qs.SecureSetting; 
 
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
-
+import com.android.internal.util.pixeldust.PixeldustUtils;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
 import com.android.systemui.qs.QSHost;
+import com.android.systemui.qs.SecureSetting; 
 import com.android.systemui.qs.tileimpl.QSTileImpl;
-
 import com.android.systemui.R;
 
 public class AmbientPlayTile extends QSTileImpl<BooleanState> {
@@ -50,6 +49,11 @@ public class AmbientPlayTile extends QSTileImpl<BooleanState> {
     public void handleSetListening(boolean listening) {
         if (mListening == listening) return;
         mListening = listening;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return PixeldustUtils.isAmbientPlayAvailable(mContext);
     }
 
     @Override 
