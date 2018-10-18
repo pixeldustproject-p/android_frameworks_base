@@ -1555,12 +1555,13 @@ public final class SystemServer {
             traceBeginAndSlog("StartLauncherAppsService");
             mSystemServiceManager.startService(LauncherAppsService.class);
             traceEnd();
-            Slog.i(TAG, "Starting PocketService");
-            mSystemServiceManager.startService(PocketService.class);
 
             traceBeginAndSlog("StartCrossProfileAppsService");
             mSystemServiceManager.startService(CrossProfileAppsService.class);
             traceEnd();
+
+            Slog.i(TAG, "Starting PocketService");
+            mSystemServiceManager.startService(PocketService.class);
         }
 
         if (!isWatch) {

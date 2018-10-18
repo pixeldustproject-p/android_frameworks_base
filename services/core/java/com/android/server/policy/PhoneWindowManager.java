@@ -6379,7 +6379,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         setHdmiPlugged(!mHdmiPlugged);
     }
 
-
     private boolean isHwKeysDisabled() {
         return mKeyHandler != null ? mKeyHandler.isHwKeysDisabled() : false;
     }
