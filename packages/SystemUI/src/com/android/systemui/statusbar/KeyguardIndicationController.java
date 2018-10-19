@@ -430,7 +430,7 @@ public class KeyguardIndicationController {
             Settings.System.LOCKSCREEN_CHARGING_CURRENT, 1, UserHandle.USER_CURRENT) == 1;
 
         if (mChargingCurrent != 0 && showChargingCurrent) {
-            chargingCurrent = "\n" + (mChargingCurrent / 1000) + "mA/h / "
+            chargingCurrent = "\n" + (mChargingCurrent / 1000) + "mA / "
                     + (mChargingVoltage / 1000 / 1000) + "V";
         }
 
