@@ -309,4 +309,9 @@ public class PixeldustUtils {
     public static boolean isABdevice(Context context) {
         return SystemProperties.getBoolean("ro.build.ab_update", false);
     }
+
+    public static boolean isAmbientPlayAvailable(Context context) {
+        return context.getResources()
+                .getBoolean(com.android.internal.R.bool.config_supportAmbientRecognition);
+    }
 }
