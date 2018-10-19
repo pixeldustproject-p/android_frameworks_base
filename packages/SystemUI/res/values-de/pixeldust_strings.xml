@@ -14,7 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <!-- Navbar Tuner -->
     <string name="preview">Vorschau</string>
@@ -39,6 +39,7 @@
     <string name="navbar_editor_summary">Navigationsleiste konfigurieren</string>
     <string name="menu_ime_always_show">Menü- / Tastatur-Umschalter (immer anzeigen)</string>
     <string name="search">Suche</string>
+    <string name="nav_bar_layout_inverse">\"Zurück\"- und \"Letzte Apps\"-Tasten tauschen</string>
 
     <string name="global_action_restart_advanced">Erweiterter Neustart</string>
 
@@ -132,5 +133,151 @@
 
     <string name="theme_info_title">Wussten Sie schon?</string>
     <string name="theme_info_message">Die UI-Design-Kachel ist eine hervorragende Möglichkeit, um die Akzentfarbe oder den UI-Stil einfach zu wechseln.\n\nUm zwischen Akzentfarbe und UI-Stil zu wechseln, drücken Sie einfach lange auf die Kachel und tippen Sie dann erneut, um auf die jeweilige Auswahlseite zu gelangen.</string>
+
+    <string name="screenshot_abort_title">Screenshot wurde nicht erstellt</string>
+    <string name="screenshot_abort_text">Vorgang abgebrochen.</string>
+
+    <!-- PixelDust Settings Tile -->
+    <string name="quick_settings_pixeldust_label">PixelDust Einstellungen</string>
+
+    <!-- Reboot/Recovery QS Tile -->
+    <string name="quick_settings_reboot_label">Neustart</string>
+    <string name="quick_settings_reboot_recovery_label">Recovery</string>
+
+    <!-- Advance location quick setting tile -->
+    <string name="quick_settings_secondary_location_off"></string>
+    <string name="quick_settings_location_secondary_battery_saving">Akku-Sparmodus</string>
+    <string name="accessibility_quick_settings_location_battery_saving">Standort: Akku-Sparmodus.</string>
+    <string name="quick_settings_location_secondary_gps_only">Nur GPS</string>
+    <string name="accessibility_quick_settings_location_gps_only">Standort: Nur GPS.</string>
+    <string name="quick_settings_location_secondary_high_accuracy">Hohe Genauigkeit</string>
+    <string name="accessibility_quick_settings_location_high_accuracy">Standort: Hohe Genauigkeit.</string>
+
+    <!-- SmartPixels QS Tile -->
+    <string name="quick_settings_smart_pixels">Smart Pixels</string>
+    <string name="quick_settings_smart_pixels_on_power_save">Smart Pixels automatisch einschalten</string>
+
+    <!-- Always on Display Tile -->
+    <string name="quick_settings_always_on_display_label">\"Always On\"-Inaktivitätsdisplay</string>
+    <!-- Content description of the ambient display tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
+    <string name="accessibility_quick_settings_always_on_display_off">\"Always On\"-Inaktivitätsdisplay deaktiviert.</string>
+    <!-- Content description of the ambient display tile in quick settings when on (not shown on the screen). [CHAR LIMIT=NONE] -->
+    <string name="accessibility_quick_settings_always_on_display_on">\"Always On\"-Inaktivitätsdisplay aktiviert.</string>
+    <!-- Announcement made when ambient display changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
+    <string name="accessibility_quick_settings_always_on_display_changed_off">\"Always On\"-Display wurde deaktiviert.</string>
+    <!-- Announcement made when ambient display changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
+    <string name="accessibility_quick_settings_always_on_display_changed_on">\"Always On\"-Display wurde aktiviert.</string>
+
+    <!-- Screenshot QS tile -->
+    <string name="quick_settings_screenshot_label">Bildschirmfoto</string>
+    <string name="quick_settings_region_screenshot_label">Bildschirm-Ausschnitt</string>
+
+     <!-- Sync QS Tile -->
+    <string name="quick_settings_sync_label">Sync</string>
+    <string name="accessibility_quick_settings_sync_off">Sync deaktiv</string>
+    <string name="accessibility_quick_settings_sync_on">Sync aktiv</string>
+    <string name="accessibility_quick_settings_sync_changed_off">Sync deaktiviert</string>
+    <string name="accessibility_quick_settings_sync_changed_on">Sync aktiviert</string>
+
+    <!-- Navigation Bar tile -->
+    <string name="quick_settings_navbar_title">Navigationsleiste</string>
+    <string name="accessibility_quick_settings_navbar_off">Navigationsleiste deaktiv</string>
+    <string name="accessibility_quick_settings_navbar_on">Navigationsleiste aktiv</string>
+    <string name="accessibility_quick_settings_navbar_changed_off">Navigationsleiste wurde deaktiviert.</string>
+    <string name="accessibility_quick_settings_navbar_changed_on">Navigationsleiste wurde aktiviert.</string>
+
+    <!-- Caffeine QS Tile -->
+    <string name="quick_settings_caffeine_label">Koffein</string>
+    <string name="accessibility_quick_settings_caffeine_off">Koffein deaktiv</string>
+    <string name="accessibility_quick_settings_caffeine_on">Koffein aktiv</string>
+
+    <!-- Caffeine tile -->
+    <string name="caffeine_info_title">Wussten Sie schon?</string>
+    <string name="caffeine_info_message">Die Koffein-Kachel kann genutzt werden, um den Bildschirm anzulassen.\n\nBitte beachten Sie, dass die Funktion automatisch zurückgesetzt wird, wenn der Bildschirm ausgeschaltet wird.</string>
+
+    <!-- AmbientPlay: The contents of the displayed recognition. -->
+    <string name="ambient_recognition_notification">Now Playing</string>
+    <string name="ambient_recognition_notification_channel">Benachrichtigungen über erkannte Lieder</string>
+    <string name="ambient_recognition_information">%1$s von %2$s</string>
+
+    <!-- QS Colums -->
+    <string name="qs_menu_item_qs_columns">Kacheln auf Quickbar</string>
+    <string name="qs_menu_item_columns">Spalten</string>
+    <string name="qs_menu_item_columns_landscape">Spalten (Landscape)</string>
+    <string name="qs_menu_item_reset">Zurücksetzen</string>
+    <string name="qs_menu_item_titles">Beschriftung anzeigen</string>
+    <string name="qs_menu_item_rows_landscape">Zeilen (Landscape)</string>
+    <string name="qs_menu_item_rows">Zeilen</string>
+
+    <!-- Heads up snooze toast -->
+    <string name="heads_up_snooze_message_one_minute"><xliff:g id="string">%s</xliff:g> - Pop-Up Benachrichtigungen sind für 1 Minute deaktiviert.</string>
+    <string name="heads_up_snooze_message"><xliff:g id="string">%s</xliff:g> - Pop-Up Benachrichtigungen sind für <xliff:g id="number">%d</xliff:g> Minuten deaktiviert.</string>
+
+    <!-- Heads up QS tile -->
+    <string name="quick_settings_heads_up_label">Pop-Up Benachrichtigungen</string>
+    <string name="accessibility_quick_settings_heads_up_off">Pop-Up Benachrichtigungen deaktiv.</string>
+    <string name="accessibility_quick_settings_heads_up_on">Pop-Up Benachrichtigungen aktiv.</string>
+    <string name="accessibility_quick_settings_heads_up_changed_off">Pop-Up Benachrichtigungen wurden deaktiviert.</string>
+    <string name="accessibility_quick_settings_heads_up_changed_on">Pop-Up Benachrichtigungen wurden aktiviert.</string>
+
+    <!-- Ambient display QS tile -->
+    <string name="quick_settings_ambient_display_label">Ambient Display</string>
+    <string name="accessibility_quick_settings_ambient_display_off">Inaktivitätsdisplay deaktiv.</string>
+    <string name="accessibility_quick_settings_ambient_display_on">Inaktivitätsdisplay aktiv.</string>
+    <string name="accessibility_quick_settings_ambient_display_changed_off">Inaktivitätsdisplay wurde deaktiviert.</string>
+    <string name="accessibility_quick_settings_ambient_display_changed_on">Inaktivitätsdisplay wurde aktiviert.</string>
+
+    <!-- 4G LTE switch -->
+    <string name="show_fourg_title">4G statt LTE anzeigen</string>
+    <string name="show_fourg_summary">LTE-Symbol in der Statusleiste durch 4G ersetzen</string>
+
+    <!-- OnTheSpot: Action denial button text. [CHAR LIMIT=NONE] -->
+    <string name="on_the_spot_deny">NEIN DANKE</string>
+    <!-- OnTheSpot: Action confirmation button text. [CHAR LIMIT=NONE] -->
+    <string name="on_the_spot_confirm">OKAY</string>
+    <!-- OnTheSpot: Quick Settings quick pull-down feature description message. [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_quick_pull_down">Möchten Sie, dass beim Anfassen der Statusleiste auf der rechten Hälfte die Schnelleinstellungen auf einmal ganz heruntergezogen werden können?</string>
+    <!-- OnTheSpot: Title of the Quick Settings quick pull-down feature for the reset dialog. [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_quick_pull_down_name">Schnelleinstellungen auf einmal herunterziehen</string>
+    <string name="quick_settings_quick_pull_down_summary">Automatisch die Schnelleinstellungen auf einmal herunterziehen, wenn die Statusleiste auf der rechten Hälfte angefasst wird</string>
+
+    <!-- Expanded Desktop QS Tile -->
+    <string name="quick_settings_expanded_desktop_label">Erweiterte Oberfläche</string>
+    <string name="quick_settings_expanded_desktop">Erweitert</string>
+    <string name="quick_settings_expanded_desktop_off">Normal</string>
+    <string name="quick_settings_expanded_navigation_off">Navigationsleiste AUS</string>
+    <string name="quick_settings_expanded_statusbar_off">Statusleiste AUS</string>
+
+    <string name="quick_settings_sleepscreen_label">Display ausschalten</string>
+
+    <!-- Compass QS Tile -->
+    <string name="quick_settings_compass_label">Kompass</string>
+    <string name="quick_settings_compass_value"><xliff:g id="degrees">%1$.0f</xliff:g>\u00b0 <xliff:g id="direction">%2$s</xliff:g></string>
+    <string name="quick_settings_compass_init">Initialisierung\u2026</string>
+    <string name="accessibility_quick_settings_compass_off">Kompass deaktiv</string>
+    <string name="accessibility_quick_settings_compass_on">Kompass aktiv</string>
+    <string name="accessibility_quick_settings_compass_changed_off">Kompass wurde deaktiviert.</string>
+    <string name="accessibility_quick_settings_compass_changed_on">Kompass wurde aktiviert.</string>
+    <string name="quick_settings_compass_N">N</string>
+    <string name="quick_settings_compass_NE">NO</string>
+    <string name="quick_settings_compass_E">O</string>
+    <string name="quick_settings_compass_SE">SO</string>
+    <string name="quick_settings_compass_S">S</string>
+    <string name="quick_settings_compass_SW">SW</string>
+    <string name="quick_settings_compass_W">W</string>
+    <string name="quick_settings_compass_NW">NW</string>
+
+    <!-- Gaming Mode -->
+    <string name="gaming_mode_tile_title">Spielmodus</string>
+    <string name="gaming_mode_tile_toast">Spielmodus aktiv</string>
+    <string name="gaming_mode_tile_toast_disabled">Spielmodus deaktiv</string>
+    <string name="gaming_mode_dialog_title">Wussten Sie schon?</string>
+    <string name="gaming_mode_dialog_message">Wenn der Spielmodus aktiviert wird, dann wird der Ruftonmodus auf Vibration umgestellt, alle Pop-up Benachrichtigungen werden unterdrückt und die Funktion der Hardware-Tasten wird deaktiviert. Die Medienlautstärke wird auf den Maximalwert erhöht. Sobald Sie den Spielmodus wieder verlassen, werden alle o.g. Veränderungen wieder auf die jeweilige Standardeinstellung zurückgesetzt.</string>
+    <string name="accessibility_quick_settings_gaming_mode_on">Spielmodus wurde aktiviert.</string>
+    <string name="accessibility_quick_settings_gaming_mode_off">Spielmodus wurde deaktiviert.</string>
+
+    <!-- Typing virtual buttons -->
+    <string name="accessibility_dpad_left">Cursor links</string>
+    <string name="accessibility_dpad_right">Cursor rechts</string>
 
 </resources>

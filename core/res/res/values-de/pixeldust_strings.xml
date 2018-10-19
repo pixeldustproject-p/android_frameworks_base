@@ -15,6 +15,8 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!-- Vendor mismatched fingerprint warning [CHAR LIMIT=NONE] -->
+  <string name="system_error_vendorprint">Das Vendor-Image stimmt nicht mit dem des Systems überein. Bitte das <xliff:g id="string">%s</xliff:g> Vendor-Image für ihr Gerät flashen</string>
 
   <string name="reboot_to_recovery_title">Recovery-Start</string>
   <string name="reboot_to_recovery_message">Recovery wird gestartet</string>
@@ -22,5 +24,35 @@
   <string name="reboot_to_bootloader_message">Bootloader wird gestartet</string>
   <string name="reboot_title">System-Neustart</string>
   <string name="reboot_message">System wird neu gestartet</string>
+
+  <!-- MicroG -->
+  <string name="permlab_fakePackageSignature">Paketsignatur imitieren</string>
+  <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permdesc_fakePackageSignature">Erlaubt einer App, eine andere App nachzuahmen. Böswillige Anwendungen erhalten hierdurch möglicherweise ihre persönlichen Daten. Erteilen Sie diese Berechtigung mit extremer Vorsicht!</string>
+
+  <!-- AOKP custom system animations -->
+  <string name="animation_fade">Ausblenden</string>
+  <string name="animation_slide_right">Gleiten von rechts</string>
+  <string name="animation_slide_left">Gleiten von links</string>
+  <string name="animation_slide_right_no_fade">Gleiten von rechts (ohne verblassen)</string>
+  <string name="animation_slide_left_no_fade">Gleiten von links (ohne verblassen)</string>
+  <string name="animation_slide_up">Gleiten von unten</string>
+  <string name="animation_slide_down">Gleiten von oben</string>
+  <string name="animation_default">Standard</string>
+  <string name="animation_translucent">Transparent</string>
+  <string name="animation_grow_shrink">Einblenden (von oben)</string>
+  <string name="animation_grow_shrink_center">Einblenden (aus der Mitte)</string>
+  <string name="animation_grow_shrink_bottom">Einblenden (von unten)</string>
+  <string name="animation_grow_shrink_left">Einblenden (von links)</string>
+  <string name="animation_grow_shrink_right">Einblenden (von rechts)</string>
+  <string name="animation_random">Zufällig</string>
+  <string name="action_null">Leer</string>
+
+  <!-- Pocket Lock -->
+  <string name="pocket_lock_message_long_press">Ein-/Aus-Taste lange drücken, um mit dem Gerät zu interagieren</string>
+
+  <!-- SystemUI Restart -->
+  <string name="systemui_restart_title">SystemUI-Neustart erforderlich</string>
+  <string name="systemui_restart_message">Damit alle Änderungen wirksam werden, muss das SystemUI neu gestartet werden. Jetzt neustarten?</string>
 
 </resources>
