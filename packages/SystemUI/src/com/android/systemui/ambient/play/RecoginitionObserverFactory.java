@@ -108,7 +108,6 @@ public class RecoginitionObserverFactory extends RecoginitionObserver {
 
         public void tryMatchCurrentBuffer() {
             if (!mRecognitionEnabled) return;
-            if (mManager.isCharging()) return;
             if (mBufferIndex > 0) {
                 new Thread() {
                     public void run() {
@@ -238,10 +237,6 @@ public class RecoginitionObserverFactory extends RecoginitionObserver {
             Log.d(TAG, "Cannot observe while being disconnected, aborting..");
             return;
         }
-        /*if (mManager.isCharging()) {
-            Log.d(TAG, "Cannot observe while charging, aborting..");
-            return;
-        }*/
         try {
             mRecorder.startRecording();
             mRecThread = new RecorderThread();
