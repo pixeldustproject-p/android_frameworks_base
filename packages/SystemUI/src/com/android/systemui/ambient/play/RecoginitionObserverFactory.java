@@ -54,6 +54,7 @@ public class RecoginitionObserverFactory extends RecoginitionObserver {
         private long mLastMatchTryTime;
 
         public void run() {
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
             Log.d(TAG, "Started reading recorder...");
             mLastMatchTryTime = SystemClock.uptimeMillis();
 
@@ -111,6 +112,7 @@ public class RecoginitionObserverFactory extends RecoginitionObserver {
             if (mBufferIndex > 0) {
                 new Thread() {
                     public void run() {
+                        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
                         // Allow only one upload call at a time
                         if (mDataSending) {
                             //Log.d(TAG, "Not sending, data already sending");
