@@ -78,4 +78,12 @@
     <!-- Ambient Notification icon/text dynamic tint -->
     <color name="notification_ambient_default_color">@android:color/notification_text_default_color</color>
 
+    <!-- QS Tiles Colors -->
+    <color name="qs_disabled">#656565</color>
+    <color name="qs_inactive">#656565</color>
+    <color name="qs_active">#ffffff</color>
+    <color name="qs_tile_disabled">#a6a6a6</color>
+    <color name="qs_tile_inactive">#a6a6a6</color>
+    <color name="qs_tile_active">#000000</color>
+
 </resources>
