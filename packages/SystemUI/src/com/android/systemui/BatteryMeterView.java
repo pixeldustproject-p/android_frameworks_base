@@ -104,6 +104,7 @@ public class BatteryMeterView extends LinearLayout implements
     private int mTextChargingSymbol;
 
     private boolean mQsHeaderOrKeyguard;
+    private boolean mPowerSave;
 
     public BatteryMeterView(Context context) {
         this(context, null, 0);
@@ -205,7 +206,7 @@ public class BatteryMeterView extends LinearLayout implements
     }
 
     private boolean forcePercentageQsHeader() {
-        return mQsHeaderOrKeyguard && mShowPercentOnQSB == 1
+        return (mQsHeaderOrKeyguard || mPowerSave) && mShowPercentOnQSB == 1
                 && ((mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_PORTRAIT && mShowBatteryPercent == 0)
                 || mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_TEXT
                 || (isCircleBattery() && mShowBatteryPercent == 0));
@@ -288,16 +289,12 @@ public class BatteryMeterView extends LinearLayout implements
 
     @Override
     public void onBatteryLevelChanged(int level, boolean pluggedIn, boolean charging) {
-        if (isCircleBattery()
-            || mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_PORTRAIT) {
-            setForceShowPercent(pluggedIn);
-        }
         mDrawable.setBatteryLevel(level);
         mDrawable.setCharging(pluggedIn);
         mLevel = level;
         if (mCharging != pluggedIn) {
             mCharging = pluggedIn;
-            updatePercentText();
+            updateShowPercent();
         }
         setContentDescription(
                 getContext().getString(charging ? R.string.accessibility_battery_level_charging
@@ -312,6 +309,10 @@ public class BatteryMeterView extends LinearLayout implements
     @Override
     public void onPowerSaveChanged(boolean isPowerSave) {
         mDrawable.setPowerSave(isPowerSave);
+        if (mPowerSave != isPowerSave) {
+            mPowerSave = isPowerSave;
+            updateShowPercent();
+        }
     }
 
     private TextView loadPercentView() {
