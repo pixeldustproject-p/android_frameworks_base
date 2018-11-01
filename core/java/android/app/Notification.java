@@ -501,6 +501,23 @@ public class Notification implements Parcelable
     public int defaults;
 
     /**
+     * @hide
+     */
+    public int backgroundColor;
+    /**
+     * @hide
+     */
+    public int foregroundColor;
+    /**
+     * @hide
+     */
+    public int primaryTextColor;
+    /**
+     * @hide
+     */
+    public int secondaryTextColor;
+
+    /**
      * Bit to be bitwise-ored into the {@link #flags} field that should be
      * set if you want the LED on for this notification.
      * <ul>
@@ -2216,6 +2233,11 @@ public class Notification implements Parcelable
         }
 
         mGroupAlertBehavior = parcel.readInt();
+
+        backgroundColor = parcel.readInt();
+        foregroundColor = parcel.readInt();
+        primaryTextColor = parcel.readInt();
+        secondaryTextColor = parcel.readInt();
     }
 
     @Override
@@ -2334,6 +2356,11 @@ public class Notification implements Parcelable
         if (!heavy) {
             that.lightenPayload(); // will clean out extras
         }
+
+        that.backgroundColor = this.backgroundColor;
+        that.foregroundColor = this.foregroundColor;
+        that.primaryTextColor = this.primaryTextColor;
+        that.secondaryTextColor = this.secondaryTextColor;
     }
 
     /**
@@ -2651,6 +2678,11 @@ public class Notification implements Parcelable
         }
 
         parcel.writeInt(mGroupAlertBehavior);
+
+        parcel.writeInt(backgroundColor);
+        parcel.writeInt(foregroundColor);
+        parcel.writeInt(primaryTextColor);
+        parcel.writeInt(secondaryTextColor);
 
         // mUsesStandardHeader is not written because it should be recomputed in listeners
     }
@@ -4553,6 +4585,11 @@ public class Notification implements Parcelable
                     }
                 }
             }
+
+            mN.backgroundColor = backgroundColor;
+            mN.foregroundColor = mForegroundColor;
+            mN.primaryTextColor = mPrimaryTextColor;
+            mN.secondaryTextColor = mSecondaryTextColor;
         }
 
         private void updateBackgroundColor(RemoteViews contentView) {
