@@ -19,26 +19,25 @@ package com.android.systemui.qs.tiles;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.provider.Settings;
-import android.provider.Settings.Secure;
 import android.service.quicksettings.Tile;
 
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.internal.util.pixeldust.PixeldustUtils;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
 import com.android.systemui.qs.QSHost;
-import com.android.systemui.qs.SecureSetting; 
+import com.android.systemui.qs.SystemSetting;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
 import com.android.systemui.R;
 
 public class AmbientPlayTile extends QSTileImpl<BooleanState> {
     private boolean mListening; 
-    private final SecureSetting mSetting; 
+    private final SystemSetting mSetting; 
 	
     private final Icon mIcon = ResourceIcon.get(R.drawable.ic_music_note_24dp);
        
     public AmbientPlayTile(QSHost host) {
         super(host);
-        mSetting = new SecureSetting(mContext, mHandler, Secure.AMBIENT_RECOGNITION) { 
+        mSetting = new SystemSetting(mContext, mHandler, Settings.System.AMBIENT_RECOGNITION) { 
             @Override 
             protected void handleValueChanged(int value, boolean observedChange) { 
                 handleRefreshState(value); 
