@@ -195,11 +195,6 @@
     <string name="caffeine_info_title">Wussten Sie schon?</string>
     <string name="caffeine_info_message">Die Koffein-Kachel kann genutzt werden, um den Bildschirm anzulassen.\n\nBitte beachten Sie, dass die Funktion automatisch zurückgesetzt wird, wenn der Bildschirm ausgeschaltet wird.</string>
 
-    <!-- AmbientPlay: The contents of the displayed recognition. -->
-    <string name="ambient_recognition_notification">Now Playing</string>
-    <string name="ambient_recognition_notification_channel">Benachrichtigungen über erkannte Lieder</string>
-    <string name="ambient_recognition_information">%1$s von %2$s</string>
-
     <!-- QS Colums -->
     <string name="qs_menu_item_qs_columns">Kacheln auf Quickbar</string>
     <string name="qs_menu_item_columns">Spalten</string>

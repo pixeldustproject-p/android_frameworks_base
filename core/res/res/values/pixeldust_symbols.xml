@@ -186,4 +186,8 @@
   <java-symbol type="integer" name="config_buttonBrightnessSettingDefault" />
   <java-symbol type="bool" name="config_deviceHasVariableButtonBrightness" />
 
+  <!-- Ambient Play -->
+  <java-symbol type="string" name="ambient_recognition_notification" />
+  <java-symbol type="string" name="ambient_recognition_information" />
+
 </resources>

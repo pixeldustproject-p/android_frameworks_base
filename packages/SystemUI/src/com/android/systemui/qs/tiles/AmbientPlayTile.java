@@ -74,7 +74,7 @@ public class AmbientPlayTile extends QSTileImpl<BooleanState> {
  
     @Override 
     public CharSequence getTileLabel() { 
-        return mContext.getString(R.string.ambient_recognition_notification); 
+        return mContext.getString(com.android.internal.R.string.ambient_recognition_notification); 
     } 
  
     @Override 
@@ -87,14 +87,14 @@ public class AmbientPlayTile extends QSTileImpl<BooleanState> {
         state.icon = mIcon;
         state.value = play;
         state.slash.isSlashed = !state.value;
-        state.label = mContext.getString(R.string.ambient_recognition_notification);
+        state.label = mContext.getString(com.android.internal.R.string.ambient_recognition_notification);
         if (play) {
             state.contentDescription =  mContext.getString(
-                    R.string.ambient_recognition_notification);
+                    com.android.internal.R.string.ambient_recognition_notification);
             state.state = Tile.STATE_ACTIVE;
         } else {
             state.contentDescription =  mContext.getString(
-                    R.string.ambient_recognition_notification);
+                    com.android.internal.R.string.ambient_recognition_notification);
             state.state = Tile.STATE_INACTIVE;
         }
     }
