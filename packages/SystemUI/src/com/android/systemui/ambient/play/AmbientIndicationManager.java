@@ -23,6 +23,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -43,6 +44,8 @@ import java.util.List;
 
 import com.android.internal.util.pixeldust.PixeldustUtils;
 import com.android.systemui.R;
+
+import com.android.internal.util.pixeldust.ambient.play.AmbientPlayHistoryManager;
 
 public class AmbientIndicationManager {
 
@@ -237,9 +240,15 @@ public class AmbientIndicationManager {
         isRecognitionObserverBusy = false;
         lastUpdated = System.currentTimeMillis();
         NO_MATCH_COUNT = 0;
+        if (!isRecognitionEnabled) {
+            dispatchRecognitionNoResult();
+            return;
+        }
         if (isRecognitionNotificationEnabled) {
             showNotification(observed.Song, observed.Artist);
         }
+        AmbientPlayHistoryManager.addSong(observed.Song, observed.Artist, mContext);
+        AmbientPlayHistoryManager.sendMatchBroadcast(mContext);
         for (AmbientIndicationManagerCallback cb : mCallbacks) {
             try {
                 cb.onRecognitionResult(observed);
@@ -309,6 +318,11 @@ public class AmbientIndicationManager {
         mBuilder.setTicker(String.format(mContext.getResources().getString(
                 com.android.internal.R.string.ambient_recognition_information), song, artist));
         mBuilder.setExtras(extras);
+
+        Intent historyIntent = new Intent();
+        historyIntent.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings$AmbientPlayHistoryActivity"));
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, historyIntent, 0);
+        mBuilder.setContentIntent(pendingIntent);
 
         NotificationManager mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
