@@ -5550,6 +5550,9 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QS_TILE_STYLE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.PULSE_APPS_BLACKLIST),
+                    false, this, UserHandle.USER_ALL);
             update();
         }
 
@@ -5563,15 +5566,17 @@ public class StatusBar extends SystemUI implements DemoMode,
                     Settings.System.QS_TILE_STYLE))) {
                 stockTileStyle();
                 updateTileStyle();
-            }
-            update();
-            if (uri.equals(Settings.Secure.getUriFor(
+            } else if (uri.equals(Settings.Secure.getUriFor(
                     Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS))) {
                 setFpToDismissNotifications();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.LESS_BORING_HEADS_UP))) {
                 setUseLessBoringHeadsUp();
+            } else if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.PULSE_APPS_BLACKLIST))) {
+                setPulseBlacklist();
             }
+            update();
         }
 
         public void update() {
@@ -5600,6 +5605,12 @@ public class StatusBar extends SystemUI implements DemoMode,
                 Settings.System.LESS_BORING_HEADS_UP, 0,
                 UserHandle.USER_CURRENT) == 1;
         mEntryManager.setUseLessBoringHeadsUp(lessBoringHeadsUp);
+    }
+
+    private void setPulseBlacklist() {
+        String blacklist = Settings.Secure.getStringForUser(mContext.getContentResolver(),
+                Settings.Secure.PULSE_APPS_BLACKLIST, UserHandle.USER_CURRENT);
+        getMediaManager().setPulseBlacklist(blacklist);
     }
 
     private final BroadcastReceiver mBannerActionBroadcastReceiver = new BroadcastReceiver() {
