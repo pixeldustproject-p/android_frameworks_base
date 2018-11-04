@@ -2363,6 +2363,10 @@ public class StatusBar extends SystemUI implements DemoMode,
         return ThemeAccentUtils.isUsingChocolateTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId());
     }
 
+    public boolean isUsingShishuCosmosTheme() {
+        return ThemeAccentUtils.isUsingShishuCosmosTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId());
+    }
+
     // Unloads the stock dark theme
     public void unloadStockDarkTheme() {
         ThemeAccentUtils.unloadStockDarkTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId());
@@ -4258,6 +4262,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         boolean useShishuNightsTheme = false;
         boolean useBlackTheme = false;
         boolean useDarkTheme = false;
+        boolean useShishuCosmosTheme = false;
         if (userThemeSetting == 0) {
             // The system wallpaper defines if QS should be light or dark.
             WallpaperColors systemColors = mColorExtractor
@@ -4274,22 +4279,23 @@ public class StatusBar extends SystemUI implements DemoMode,
             useBlackTheme = userThemeSetting == 3;
             useShishuNightsTheme = userThemeSetting == 4;
             useChocolateTheme = userThemeSetting == 5;
+            useShishuCosmosTheme = userThemeSetting == 6;
+            unfuckBlackWhiteAccent(); // Check for black and white accent
         }
         if (isUsingDarkTheme() != useDarkTheme) {
-            unfuckBlackWhiteAccent(); // Check for black and white accent
             ThemeAccentUtils.setLightDarkTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), useDarkTheme);
         }
         if (isUsingBlackTheme() != useBlackTheme) {
-            unfuckBlackWhiteAccent(); // Check for black and white accent
             ThemeAccentUtils.setBlackTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), useBlackTheme);
         }
         if (isUsingShishuNightsTheme() != useShishuNightsTheme) {
-            unfuckBlackWhiteAccent(); // Check for black and white accent
             ThemeAccentUtils.setShishuNightsTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), useShishuNightsTheme);
         }
         if (isUsingChocolateTheme() != useChocolateTheme) {
-            unfuckBlackWhiteAccent(); // Check for black and white accent
             ThemeAccentUtils.setChocolateTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), useChocolateTheme);
+        }
+        if (isUsingShishuCosmosTheme() != useShishuCosmosTheme) {
+            ThemeAccentUtils.setShishuCosmosTheme(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), useShishuCosmosTheme);
         }
 
         // Lock wallpaper defines the color of the majority of the views, hence we'll use it

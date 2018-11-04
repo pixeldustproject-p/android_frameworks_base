@@ -186,6 +186,8 @@ public class ThemeTile extends QSTileImpl<BooleanState> {
                 R.string.system_theme_style_shishunights, Settings.System.SYSTEM_THEME));
         sStyleItems.add(new ThemeTileItem(5, -1,
                 R.string.system_theme_style_chocolate, Settings.System.SYSTEM_THEME));
+        sStyleItems.add(new ThemeTileItem(6, -1,
+                R.string.system_theme_style_shishucosmos, Settings.System.SYSTEM_THEME));
     }
 
     private enum Mode {
