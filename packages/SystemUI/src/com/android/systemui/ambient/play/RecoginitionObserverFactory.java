@@ -23,6 +23,8 @@ import android.media.AudioRecord;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.android.internal.util.pixeldust.PixeldustUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -36,9 +38,11 @@ import java.util.regex.Pattern;
 public class RecoginitionObserverFactory extends RecoginitionObserver {
 
     private RecorderThread mRecThread;
+    private Context mContext;
 
     public RecoginitionObserverFactory(Context context) {
         super(context);
+        mContext = context;
     }
 
     /**
@@ -138,6 +142,10 @@ public class RecoginitionObserverFactory extends RecoginitionObserver {
 
         private String sendAudioData(byte[] inputBuffer, int length) {
             Log.d(TAG, "Preparing to send audio data: " + length + " bytes");
+            if (!PixeldustUtils.isConnectionAvailable(mContext)) {
+                Log.d(TAG, "Cannot send audio data while being disconnected, aborting..");
+                return "";
+            }
             try {
                 URL url = new URL("http://search.midomi.com:443/v2/?method=search&type=identify");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -226,6 +234,10 @@ public class RecoginitionObserverFactory extends RecoginitionObserver {
     public void startRecording() {
         mBufferIndex = 0;
         if (!mRecognitionEnabled) return;
+        if (!PixeldustUtils.isConnectionAvailable(mContext)) {
+            Log.d(TAG, "Cannot observe while being disconnected, aborting..");
+            return;
+        }
         /*if (mManager.isCharging()) {
             Log.d(TAG, "Cannot observe while charging, aborting..");
             return;
