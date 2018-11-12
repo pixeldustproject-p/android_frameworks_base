@@ -36,6 +36,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.Manifest;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -345,10 +347,32 @@ public class PixeldustUtils {
         }, 20);
     }
 
-    public static boolean isConnectionAvailable(Context context) {
-        ConnectivityManager connManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo network = (connManager != null) ? connManager.getActiveNetworkInfo() : null;
-        return network != null;
+    public static int isConnectionAvailable(Context context) {
+        final Context mContext = context;
+        final ConnectivityManager connManager =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        final NetworkInfo activeNetworkInfo = connManager.getActiveNetworkInfo();
+        final Network network = connManager.getActiveNetwork();
+        final NetworkCapabilities capabilities = connManager
+            .getNetworkCapabilities(network);
+        /**
+         * Return -1 if We don't have any network connectivity
+         * Return 0 if we are on WiFi  (desired)
+         * Return 1 if we are on MobileData (Little less desired)
+         * Return 2 if not sure which connection is user on but has network connectivity 
+         */
+
+        if (activeNetworkInfo == null)
+            return -1;
+        else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
+            return 0;
+        else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+            return 1;
+        else if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) 
+            && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED))
+            return 2;
+        else
+            return -1;
     }
 }

@@ -96,8 +96,8 @@ import android.metrics.LogMaker;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.BatteryManager;
 import android.os.Handler;
-import android.os.Process;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
@@ -686,10 +686,24 @@ public class StatusBar extends SystemUI implements DemoMode,
     private boolean mRecognitionEnabled;
     private boolean mAmbientRecognitionSupported;
 
-    /* Interval indicating when AP-Recogntion will run. Default is 2 minutes */
+    /* Interval indicating when AP-Recognition will run. Default is 2 minutes */
     private int mAmbientRecognitionInterval = 120000;
-    /* Interval indicating the max recording time. Default is 19 seconds */
-    private static final int AMBIENT_RECOGNITION_INTERVAL_MAX = 19000;
+    /* Interval indicating the max recording time. Default is 10 seconds */
+    private static final int AMBIENT_RECOGNITION_INTERVAL_MAX = 10000;
+    // Interval to clean the view after song is detected. (Default 3 minutes)
+    //This is needed as all / most of the work is now done in Worker thread.
+    private static final int AMBIENT_VIEW_CLEAR_INTERVAL = 180000;
+
+    private Handler ambientClearingHandler;
+    private Runnable ambientClearingRunnable;
+
+    private static final String AMBIENT_PLAY_INTENT = "ambient_play_alarm_intent";
+    private static final IntentFilter AP_INTENT_FILTER = new IntentFilter(AMBIENT_PLAY_INTENT);
+    private static final Intent AP_INTENT = new Intent(AMBIENT_PLAY_INTENT);
+    private static final int AP_REQUEST_CODE = 6969;
+    private AlarmManager alarmManager;
+    private BatteryManager mBatteryManager;
+    private static int NO_MATCH_COUNT = 0;
 
     @Override
     public void start() {
@@ -752,6 +766,8 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
+        mBatteryManager = (BatteryManager) mContext.getSystemService(Context.BATTERY_SERVICE);
+
         mDeviceProvisionedController = Dependency.get(DeviceProvisionedController.class);
 
         mBarService = IStatusBarService.Stub.asInterface(
@@ -789,6 +805,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         mWallpaperChangedReceiver.onReceive(mContext, null);
 
         mLockscreenUserManager.setUpWithPresenter(this, mEntryManager);
+        mContext.registerReceiver(ambientReceiver, AP_INTENT_FILTER);
         mAmbientSettingsObserver.observe();
         mAmbientSettingsObserver.update();
         mCustomSettingsObserver.observe();
@@ -1015,6 +1032,16 @@ public class StatusBar extends SystemUI implements DemoMode,
             ((AmbientIndicationContainer) mAmbientIndicationContainer).initializeView(this);
         }
 
+        // Initialize handler and runnable
+        ambientClearingHandler = new Handler();
+        ambientClearingRunnable = new Runnable(){
+            @Override
+            public void run() {
+                mAmbientIndicationContainer.setVisibility(View.INVISIBLE);
+                ((AmbientIndicationContainer) mAmbientIndicationContainer).hideIndication();
+            }
+        };
+
         // set the initial view visibility
         setAreThereNotifications();
 
@@ -1187,10 +1214,19 @@ public class StatusBar extends SystemUI implements DemoMode,
                 public void run() {
                     ((AmbientIndicationContainer) mAmbientIndicationContainer)
                                 .setIndication(observed.Song, observed.Artist);
+                    mAmbientIndicationContainer.setVisibility(View.VISIBLE);
                     mAmbientNotification.show(observed.Song, observed.Artist);
-                    // If the song matches then wait for 2 minutes at least before you start again.
-                    // We don't have to give results right away, as this is an Ambient feature.
-                    doStopAmbientRecognition(true);
+
+                    if (NO_MATCH_COUNT != 0)
+                        NO_MATCH_COUNT = 0;
+
+                    try {
+                        ambientClearingHandler.removeCallbacks(ambientClearingRunnable);
+                        ambientClearingHandler.postDelayed(ambientClearingRunnable, AMBIENT_VIEW_CLEAR_INTERVAL);
+                    } catch (Exception e) {
+                        // This too shall pass
+                    }
+                    doStopAmbientRecognition();
                 }
             });
         }
@@ -1200,8 +1236,17 @@ public class StatusBar extends SystemUI implements DemoMode,
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    ((AmbientIndicationContainer) mAmbientIndicationContainer).hideIndication();
-                    doStopAmbientRecognition(false);
+                    try {
+                        ambientClearingHandler.removeCallbacks(ambientClearingRunnable);
+                        ambientClearingHandler.postDelayed(ambientClearingRunnable, 0);
+                    } catch (Exception e) {
+                        // This too shall pass
+                    }
+
+                    if (!mBatteryManager.isCharging())
+                        NO_MATCH_COUNT++;
+
+                    doStopAmbientRecognition();
                 }
             });
         }
@@ -1211,8 +1256,17 @@ public class StatusBar extends SystemUI implements DemoMode,
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    ((AmbientIndicationContainer) mAmbientIndicationContainer).hideIndication();
-                    doStopAmbientRecognition(false);
+                    try {
+                        ambientClearingHandler.removeCallbacks(ambientClearingRunnable);
+                        ambientClearingHandler.postDelayed(ambientClearingRunnable, 0);
+                    } catch (Exception e) {
+                        // This too shall pass
+                    }
+
+                    if (!mBatteryManager.isCharging())
+                        NO_MATCH_COUNT++;
+
+                    doStopAmbientRecognition();
                 }
             });
         }
@@ -3310,6 +3364,32 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     };
 
+    private final BroadcastReceiver ambientReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final int whichNetwork = PixeldustUtils.isConnectionAvailable(context);
+
+            // Only start recording audio if we have internet connectivity.
+            if (whichNetwork != -1) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                        try {
+                            doAmbientRecognition();
+                            Thread.currentThread().sleep(AMBIENT_RECOGNITION_INTERVAL_MAX);
+                            // Stop recording, process audio and post result.
+                            doStopAmbientRecognition();
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }.start();
+            }
+            // Schedule it for the next time.
+            scheduleAmbientPlayAlarm(whichNetwork);
+        }
+    };
+
     public void resetUserExpandedStates() {
         ArrayList<Entry> activeNotifications = mEntryManager.getNotificationData()
                 .getActiveNotifications();
@@ -3615,6 +3695,7 @@ public class StatusBar extends SystemUI implements DemoMode,
     public void destroy() {
         // Begin old BaseStatusBar.destroy().
         mContext.unregisterReceiver(mBannerActionBroadcastReceiver);
+        mContext.unregisterReceiver(ambientReceiver);
         mLockscreenUserManager.destroy();
         try {
             mNotificationListener.unregisterAsSystemService();
@@ -4079,10 +4160,9 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
     private void updateAmbientIndicationForKeyguard() {
-        if (!mAmbientRecognitionSupported) return;
         int recognitionKeyguard = Settings.Secure.getInt(
             mContext.getContentResolver(), AMBIENT_RECOGNITION_KEYGUARD, 1);
-        if (!mRecognitionEnabled) return;
+        if (!mAmbientRecognitionSupported || !mRecognitionEnabled) return;
         if (mAmbientIndicationContainer != null && recognitionKeyguard != 0) {
             mAmbientIndicationContainer.setVisibility(View.VISIBLE);
         }
@@ -4129,43 +4209,52 @@ public class StatusBar extends SystemUI implements DemoMode,
     private void initAmbientRecognition() {
         mAmbientRecognitionSupported = mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_supportAmbientRecognition);
-        if (!mAmbientRecognitionSupported) return;
         mRecognitionEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
                 AMBIENT_RECOGNITION, 0) != 0;
-        if (!mRecognitionEnabled) return;
         mAmbientRecognitionInterval = Settings.Secure.getInt(mContext.getContentResolver(),
                 AMBIENT_RECOGNITION_INTERVAL, 120000);
-        doStopAmbientRecognition(false);
     }
 
     private void doAmbientRecognition() {
         mRecognition = new RecoginitionObserverFactory(mContext);
         mRecognition.startRecording();
-        mHandler.postDelayed(() -> {
-                 doStopAmbientRecognition(false);
-        }, AMBIENT_RECOGNITION_INTERVAL_MAX);
     }
 
-    private void doStopAmbientRecognition(boolean isSongMatched) {
+    private void doStopAmbientRecognition() {
         // If mRecognition is not initialized this means we have not started the recording, thus using stopRecording() will give NPE.
         // So, just let's go directly in handler, doAmbientRecognition() will do the work for us.
         if (mRecognition != null)
             mRecognition.stopRecording();
 
+        // Set this null so that GC can clear this up, as we are initiating this object again in doAmbientRecognition()
+        mRecognition = null;
+    }
+
+    private void scheduleAmbientPlayAlarm(int networkType) {
         // Check if "Now Playing" feature is disabled either by the user or not supported for this device
         if (!mAmbientRecognitionSupported || !mRecognitionEnabled) return;
 
-        if (isSongMatched) {
-            Log.d(TAG, "Will start listening again in 2 mins.");
-            mHandler.postDelayed(() -> {
-                    doAmbientRecognition();
-            }, 120000);
-        } else {
-            Log.d(TAG, "Will start listening again in " + mAmbientRecognitionInterval + " seconds.");
-            mHandler.postDelayed(() -> {
-                    doAmbientRecognition();
-            }, mAmbientRecognitionInterval);
-        }
+        int duration = 150000;
+
+        /**
+         * Let's try to reduce battery consumption here.
+         *  - If device is charging OR if device is on WiFi then let's not worry about scan interval and use the userdefines interval, else
+         *  - If device is not able to find matches for 20 consecutive times.
+         *    then chances are that user is probably not listening to music or maybe sleeping
+         *    So, Bump the scan interval to 5 minutes, else
+         *  - If device is on Mobile Data or anything else then let's force it to 3 minutes.
+         */
+        
+        if (mBatteryManager.isCharging() || (networkType == 0))
+            duration = mAmbientRecognitionInterval;
+        else if (NO_MATCH_COUNT >= 20)
+            duration = 300000;
+        else if (networkType == 1 || networkType == 2)
+            duration = 180000;
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, AP_REQUEST_CODE, AP_INTENT, 0);
+        alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + duration, pendingIntent);
     }
 
     /**
@@ -5884,8 +5973,10 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
 
         public void update() {
+            final Context ctx = mContext;
             initAmbientRecognition();
             updateAmbientIndicationForKeyguard();
+            scheduleAmbientPlayAlarm(PixeldustUtils.isConnectionAvailable(ctx));
         }
     }
 
