@@ -207,9 +207,7 @@ public class BatteryMeterView extends LinearLayout implements
 
     private boolean forcePercentageQsHeader() {
         return (mQsHeaderOrKeyguard || mPowerSave) && mShowPercentOnQSB == 1
-                && ((mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_PORTRAIT && mShowBatteryPercent == 0)
-                || mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_TEXT
-                || (isCircleBattery() && mShowBatteryPercent == 0));
+                && mShowBatteryPercent != 1;
     }
 
     private void loadImageView() {
@@ -259,7 +257,7 @@ public class BatteryMeterView extends LinearLayout implements
     }
 
     private void updateVisibility() {
-        if (mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_HIDDEN) {
+        if (mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_HIDDEN && !mForceShowPercent) {
             setVisibility(View.GONE);
         } else {
             setVisibility(View.VISIBLE);
@@ -349,7 +347,7 @@ public class BatteryMeterView extends LinearLayout implements
         final boolean showing = mBatteryPercentView != null;
         boolean mShow = mForceShowPercent;
 
-        if (mShowBatteryPercent == 1 /*percentage_text_next*/ || mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_TEXT) {
+        if (mShowBatteryPercent == 1 /*percentage_text_next*/ || mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_TEXT || mForceShowPercent) {
                 mShow = true;      
         } else if (mShowBatteryPercent == 2 /*percentage_default*/) {
                 mShow = false;
@@ -524,7 +522,6 @@ public class BatteryMeterView extends LinearLayout implements
         }
         updateVisibility();
         if (forcePercentageQsHeader()
-                || style == BatteryMeterDrawableBase.BATTERY_STYLE_TEXT
                 || ((isCircleBattery() || style == BatteryMeterDrawableBase.BATTERY_STYLE_PORTRAIT) && mCharging)) {
             mForceShowPercent = true;
         } else {
