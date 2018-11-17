@@ -96,10 +96,11 @@ public class KeyguardIndicationController {
     private boolean mPowerPluggedInWired;
     private boolean mPowerCharged;
     private int mChargingSpeed;
-    private int mChargingCurrent;
-    private int mChargingVoltage;
     private int mChargingWattage;
     private int mBatteryLevel;
+    private int mChargingCurrent;
+    private double mChargingVoltage;
+    private int mTemperature;
     private String mMessageToShowOnScreenOn;
 
     private KeyguardUpdateMonitorCallback mUpdateMonitorCallback;
@@ -425,13 +426,24 @@ public class KeyguardIndicationController {
                 break;
         }
 
-        String chargingCurrent = "";
-        boolean showChargingCurrent = Settings.System.getIntForUser(mContext.getContentResolver(),
-            Settings.System.LOCKSCREEN_CHARGING_CURRENT, 1, UserHandle.USER_CURRENT) == 1;
-
-        if (mChargingCurrent != 0 && showChargingCurrent) {
-            chargingCurrent = "\n" + (mChargingCurrent / 1000) + "mA / "
-                    + (mChargingVoltage / 1000 / 1000) + "V";
+        String batteryInfo = "";
+        boolean showbatteryInfo = Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.LOCKSCREEN_BATTERY_INFO, 1, UserHandle.USER_CURRENT) == 1;
+         if (showbatteryInfo) {
+            if (mChargingCurrent > 0) {
+                batteryInfo = batteryInfo + (mChargingCurrent / 1000) + "mA";
+            }
+            if (mChargingVoltage > 0) {
+                batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " · ") +
+                        String.format("%.1f", (mChargingVoltage / 1000 / 1000)) + "V";
+            }
+            if (mTemperature > 0) {
+                batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " · ") +
+                        mTemperature / 10 + "°C";
+            }
+            if (batteryInfo != "") {
+                batteryInfo = "\n" + batteryInfo;
+            }
         }
 
         String percentage = NumberFormat.getPercentInstance()
@@ -442,22 +454,23 @@ public class KeyguardIndicationController {
             // format until all languages get the new translations.
             String chargingTimeFormatted = Formatter.formatShortElapsedTimeRoundingUpToMinutes(
                     mContext, chargingTimeRemaining);
+
             try {
                 String chargingText = mContext.getResources().getString(chargingId, chargingTimeFormatted,
-                        percentage, chargingCurrent);
-                return chargingText + chargingCurrent;
+                        percentage);
+                return chargingText + batteryInfo;
             } catch (IllegalFormatConversionException e) {
-                String chargingText = mContext.getResources().getString(chargingId, chargingTimeFormatted);
-                return chargingText + chargingCurrent;
+                String chargingText =  mContext.getResources().getString(chargingId, chargingTimeFormatted);
+                return chargingText + batteryInfo;
             }
         } else {
             // Same as above
             try {
-                String chargingText = mContext.getResources().getString(chargingId, percentage);
-                return chargingText + chargingCurrent;
+                String chargingText =  mContext.getResources().getString(chargingId, percentage);
+                return chargingText + batteryInfo;
             } catch (IllegalFormatConversionException e) {
-                String chargingText = mContext.getResources().getString(chargingId);
-                return chargingText + chargingCurrent;
+                String chargingText =  mContext.getResources().getString(chargingId);
+                return chargingText + batteryInfo;
             }
         }
     }
@@ -529,6 +542,7 @@ public class KeyguardIndicationController {
             mChargingCurrent = status.maxChargingCurrent;
             mChargingVoltage = status.maxChargingVoltage;
             mChargingWattage = status.maxChargingWattage;
+            mTemperature = status.temperature;
             mChargingSpeed = status.getChargingSpeed(mSlowThreshold, mFastThreshold);
             mBatteryLevel = status.level;
             updateIndication(!wasPluggedIn && mPowerPluggedInWired);
