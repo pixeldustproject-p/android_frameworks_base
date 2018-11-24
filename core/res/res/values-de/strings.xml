@@ -1874,6 +1874,7 @@
     <string name="screenshot_edit" msgid="7867478911006447565">"Bearbeiten"</string>
     <string name="volume_dialog_ringer_guidance_vibrate" msgid="8902050240801159042">"Anrufe und Benachrichtigungen per Vibrationsalarm"</string>
     <string name="volume_dialog_ringer_guidance_silent" msgid="2128975224280276122">"Anrufe und Benachrichtigungen stummgeschaltet"</string>
+    <string name="volume_dialog_ringer_guidance_silent_no_media">"Anrufe, Benachrichtigungen und Medien stummgeschaltet"</string>
 
     <!-- Informative text shown when the device is in One handed mode. It also explains how to exit the mode. -->
     <string name="onehand_guide" xliff:restype="x-GENERIC/FULLSCREEN/TEXT">Tippen Sie auf den leeren Bereich, um den Einhandmodus zu beenden</string>
