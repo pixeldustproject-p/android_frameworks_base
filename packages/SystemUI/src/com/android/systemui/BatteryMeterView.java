@@ -482,7 +482,7 @@ public class BatteryMeterView extends LinearLayout implements
             mTextChargingSymbol = Settings.System.getIntForUser(resolver,
                 TEXT_CHARGING_SYMBOL, 0, mUser);
             mShowPercentOnQSB = Settings.System.getIntForUser(resolver,
-                SHOW_BATTERY_PERCENT_ON_QSB, 0, mUser);
+                SHOW_BATTERY_PERCENT_ON_QSB, 1, mUser);
             updateBatteryStyle();
             updateShowPercent();
             mDrawable.refresh();
