@@ -186,6 +186,8 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
 
     private int mRotateBtnStyle = R.style.RotateButtonCCWStart90;
 
+    private int mBarMode = 0;
+
     private class NavTransitionListener implements TransitionListener {
         private boolean mBackTransitioning;
         private boolean mHomeAppearing;
@@ -666,6 +668,9 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
     }
 
     public void updateNavButtonIcons() {
+        if (mBarMode != 0)
+            return;
+
         // We have to replace or restore the back and home button icons when exiting or entering
         // carmode, respectively. Recents are not available in CarMode in nav bar so change
         // to recent icon is not required.
@@ -1075,6 +1080,9 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
     }
 
     private void updateRecentsIcon() {
+        if (mBarMode != 0)
+            return;
+
         mDockedIcon.setRotation(mDockedStackExists && mVertical ? 90 : 0);
         getRecentsButton().setImageDrawable(mDockedStackExists ? mDockedIcon : mRecentIcon);
         mBarTransitions.reapplyDarkIntensity();
@@ -1450,6 +1458,9 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
             mContext.getContentResolver().registerContentObserver(
                   Settings.System.getUriFor(Settings.System.NAVIGATION_BAR_MENU_ARROW_KEYS),
                   false, this, UserHandle.USER_ALL);
+            mContext.getContentResolver().registerContentObserver(
+                  Settings.Secure.getUriFor(Settings.Secure.NAVIGATION_BAR_MODE),
+                  false, this, UserHandle.USER_ALL);
             update();
         }
 
@@ -1459,12 +1470,23 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_MENU_ARROW_KEYS))) {
+                setNavigationIconHints(mNavigationIconHints);
+            } else if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.NAVIGATION_BAR_MODE))) {
+                updateNavButtonIcons();
+            }
             update();
         }
 
         public void update() {
             mShowDpadArrowKeys = Settings.System.getIntForUser(getContext().getContentResolver(),
                     Settings.System.NAVIGATION_BAR_MENU_ARROW_KEYS, 0, UserHandle.USER_CURRENT) == 1;
+            mBarMode = Settings.Secure.getIntForUser(getContext().getContentResolver(),
+                    Settings.Secure.NAVIGATION_BAR_MODE, 0, UserHandle.USER_CURRENT);
+            updateNavButtonIcons();
             setNavigationIconHints(mNavigationIconHints);
         }
     }
