@@ -70,10 +70,10 @@ import com.android.internal.util.hwkeys.Config.ButtonConfig;
 public final class ActionUtils {
     public static final String PACKAGE_SYSTEMUI = "com.android.systemui";
     public static final String PACKAGE_SETTINGS = "com.android.settings";
-    public static final String CLASS_NAME_ICON_PICKER_GRID_ACTIVITY = "com.android.settings.smartnav.IconPackGridActivity";
-    public static final String CLASS_NAME_ICON_PICKER_ACTIVITY = "com.android.settings.smartnav.IconPickerActivity";
-    public static final String CLASS_NAME_ACTION_EDIT = "com.android.settings.smartnav.ActionPickerDialogActivity";
-    public static final String CLASS_NAME_GALLERY_PICKER = "com.android.settings.smartnav.IconPickerGallery";
+    public static final String CLASS_NAME_ICON_PICKER_GRID_ACTIVITY = "com.pixeldust.settings.preferences.IconPackGridActivity";
+    public static final String CLASS_NAME_ICON_PICKER_ACTIVITY = "com.pixeldust.settings.preferences.IconPickerActivity";
+    public static final String CLASS_NAME_ACTION_EDIT = "com.pixeldust.settings.preferences.ActionPickerDialogActivity";
+    public static final String CLASS_NAME_GALLERY_PICKER = "com.pixeldust.settings.preferences.IconPickerGallery";
     public static final String PACKAGE_ANDROID = "android";
     public static final String INTENT_EXTRA_EXCLUDE_ACTIONS = "excluded_actions";
     public static final String INTENT_ACTION_ACTION_PICKER = "intent_action_action_picker";
