@@ -1458,8 +1458,18 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
             final boolean showingIme = ((mNavigationIconHints
                     & StatusBarManager.NAVIGATION_HINT_BACK_ALT) != 0);
             final int vis = showingIme ? View.VISIBLE : View.GONE;
-            getDpadView().findViewById(R.id.dpad_left).setVisibility(vis);
-            getDpadView().findViewById(R.id.dpad_right).setVisibility(vis);
+            if (isFullGestureMode()) {
+                getDpadView().findViewById(R.id.dpad_left).setVisibility(View.GONE);
+                getDpadView().findViewById(R.id.dpad_right).setVisibility(View.GONE);
+            } else {
+                getDpadView().findViewById(R.id.dpad_left).setVisibility(vis);
+                getDpadView().findViewById(R.id.dpad_right).setVisibility(vis);
+            }
+
+            if ( isQuickStepSwipeUpEnabled()) {
+                getDpadView().findViewById(R.id.dpad_left).setVisibility(vis);
+                getDpadView().findViewById(R.id.dpad_right).setVisibility(vis);
+            }
         }
     }
 
