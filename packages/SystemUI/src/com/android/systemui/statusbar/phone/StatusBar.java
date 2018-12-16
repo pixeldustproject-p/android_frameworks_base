@@ -5577,7 +5577,6 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                   Settings.System.USE_SLIM_RECENTS),
                   false, this, UserHandle.USER_ALL);
-            update();
         }
 
         @Override
@@ -5603,7 +5602,6 @@ public class StatusBar extends SystemUI implements DemoMode,
                     Settings.System.USE_SLIM_RECENTS))) {
                 updateRecentsMode();
             }
-            update();
         }
 
         public void update() {
