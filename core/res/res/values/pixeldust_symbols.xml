@@ -222,4 +222,7 @@
   <!-- System fonts -->
   <java-symbol type="array" name="config_fontPackages" />
 
+  <!-- Whether auto face unlock is enabled by default -->
+  <java-symbol type="bool" name="config_face_unlock_enabled_by_default" />
+
 </resources>

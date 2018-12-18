@@ -175,4 +175,7 @@
     <!-- kill app long press back -->
     <integer name="config_backKillTimeout">1000</integer>
 
+    <!-- Whether auto face unlock is enabled by default -->
+    <bool name="config_face_unlock_enabled_by_default">false</bool>
+
 </resources>
