@@ -34,4 +34,7 @@
     <bool name="config_relocatePieOnRotation">true</bool> 
     <bool name="config_forcePieCentered">true</bool>
 
+    <!-- Allow devices override audio panel location to the left side -->
+    <bool name="config_audioPanelOnLeftSide">false</bool>
+
 </resources>
