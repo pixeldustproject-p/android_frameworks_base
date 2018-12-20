@@ -298,8 +298,6 @@ import com.android.internal.util.ArrayUtils;
 import com.android.internal.util.gesture.EdgeGesturePosition;
 import com.android.internal.util.gesture.EdgeServiceConstants;
 import com.android.internal.util.hwkeys.ActionHandler;
-import com.android.internal.util.hwkeys.ActionUtils;
-import com.android.internal.util.pixeldust.ActionUtils;
 import com.android.internal.util.pixeldust.PixeldustUtils;
 import com.android.internal.util.ScreenShapeHelper;
 import com.android.internal.util.ScreenshotHelper;
@@ -1063,7 +1061,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     break;
                 case MSG_TOGGLE_TORCH:
                     performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, true);
-                    ActionUtils.toggleCameraFlash();
+                    com.android.internal.util.pixeldust.ActionUtils.toggleCameraFlash();
                     break;
                 case HardkeyActionHandler.MSG_FIRE_HOME:
                     launchHomeFromHotKey();
@@ -1859,7 +1857,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             case MULTI_PRESS_POWER_NOTHING:
                 if ((mTorchActionMode == 1) && (!isScreenOn() || isDozeMode())) {
                     performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, true);
-                    ActionUtils.toggleCameraFlash();
+                    com.android.internal.util.pixeldust.ActionUtils.toggleCameraFlash();
                 }
                 break;
             case MULTI_PRESS_POWER_THEATER_MODE:
@@ -3110,7 +3108,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             boolean doShowNavbar = Settings.Secure.getIntForUser(resolver,
                     Settings.Secure.NAVIGATION_BAR_VISIBLE,
-                    ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0,
+                    com.android.internal.util.hwkeys.ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0,
                     UserHandle.USER_CURRENT) == 1;
             if (doShowNavbar != mNavbarVisible) {
                 mNavbarVisible = doShowNavbar;
@@ -3119,7 +3117,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         boolean doShowNavbar = Settings.Secure.getIntForUser(resolver,
                 Settings.Secure.NAVIGATION_BAR_VISIBLE,
-                ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0,
+                com.android.internal.util.hwkeys.ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0,
                 UserHandle.USER_CURRENT) == 1;
         if (doShowNavbar != mNavbarVisible) {
             mNavbarVisible = doShowNavbar;
@@ -9778,13 +9776,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (ActionHandler.INTENT_SHOW_POWER_MENU.equals(action)) {
                 mHandler.removeMessages(MSG_DISPATCH_SHOW_GLOBAL_ACTIONS);
                 mHandler.sendEmptyMessage(MSG_DISPATCH_SHOW_GLOBAL_ACTIONS);
-            } else if (ActionUtils.INTENT_SCREENSHOT.equals(action)) {
+            } else if (com.android.internal.util.pixeldust.ActionUtils.INTENT_SCREENSHOT.equals(action)) {
                 mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER,
                         TAG + "sendCustomAction permission denied");
                 mHandler.removeCallbacks(mScreenshotRunnable);
                 mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_FULLSCREEN);
                 mHandler.post(mScreenshotRunnable);
-            } else if (ActionUtils.INTENT_REGION_SCREENSHOT.equals(action)) {
+            } else if (com.android.internal.util.pixeldust.ActionUtils.INTENT_REGION_SCREENSHOT.equals(action)) {
                 mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER,
                         TAG + "sendCustomAction permission denied");
                 mHandler.removeCallbacks(mScreenshotRunnable);
@@ -10387,17 +10385,25 @@ public class PhoneWindowManager implements WindowManagerPolicy {
      * Send custom KeyEvent.
      * @param keyCode The key code for the new KeyEvent.
      */
-    private void triggerVirtualKeypress(final int keyCode, final boolean repeat) {
+    private void triggerVirtualKeypress(final int keyCode, final boolean repeat,
+                                        final boolean longPress) {
         final InputManager im = InputManager.getInstance();
 
         final Runnable r = new Runnable() {
             @Override
             public void run() {
                 long now = SystemClock.uptimeMillis();
-
-                final KeyEvent downEvent = new KeyEvent(now, now, KeyEvent.ACTION_DOWN,
-                        keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
-                        KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_CUSTOM);
+                final KeyEvent downEvent;
+                if (longPress) {
+                    downEvent = new KeyEvent(now, now, KeyEvent.ACTION_DOWN,
+                            keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+                            KeyEvent.FLAG_FROM_SYSTEM |
+                                    KeyEvent.FLAG_LONG_PRESS, InputDevice.SOURCE_CUSTOM);
+                } else {
+                    downEvent = new KeyEvent(now, now, KeyEvent.ACTION_DOWN,
+                            keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+                            KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_CUSTOM);
+                }
                 final KeyEvent upEvent = KeyEvent.changeAction(downEvent, KeyEvent.ACTION_UP);
 
                 im.injectInputEvent(downEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
@@ -10425,12 +10431,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 launchHomeFromHotKey();
                 break;
             case NavbarUtilities.KEY_ACTION_MENU:
-                triggerVirtualKeypress(KeyEvent.KEYCODE_MENU, false);
+                triggerVirtualKeypress(KeyEvent.KEYCODE_MENU, false, false);
                 break;
             case NavbarUtilities.KEY_ACTION_BACK:
-            case NavbarUtilities.KEY_ACTION_IN_APP_SEARCH:
-                triggerVirtualKeypress(keyCode, false);
-                break;
             case NavbarUtilities.KEY_ACTION_APP_SWITCH:
                 toggleRecentApps();
                 break;
@@ -10447,10 +10450,34 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             case NavbarUtilities.KEY_ACTION_LAST_APP:
                 awakenDreams();
                 // TODO> handle no recent apps
-                triggerVirtualKeypress(KeyEvent.KEYCODE_APP_SWITCH, !mRecentsVisible);
+                triggerVirtualKeypress(KeyEvent.KEYCODE_APP_SWITCH, !mRecentsVisible, false);
                 break;
             case NavbarUtilities.KEY_ACTION_SPLIT_SCREEN:
                 NavbarUtilities.toggleSplitScreen();
+                break;
+            case NavbarUtilities.KEY_ACTION_FLASHLIGHT:
+                com.android.internal.util.pixeldust.ActionUtils.toggleCameraFlash();
+                break;
+            case NavbarUtilities.KEY_ACTION_CLEAR_NOTIFICATIONS:
+                com.android.internal.util.pixeldust.ActionUtils.clearAllNotifications();
+                break;
+            case NavbarUtilities.KEY_ACTION_VOLUME_PANEL:
+                com.android.internal.util.pixeldust.ActionUtils.toggleVolumePanel(mContext);
+                break;
+            case NavbarUtilities.KEY_ACTION_SCREEN_OFF:
+                com.android.internal.util.pixeldust.ActionUtils.switchScreenOff(mContext);
+                break;
+            case NavbarUtilities.KEY_ACTION_NOTIFICATIONS:
+                com.android.internal.util.pixeldust.ActionUtils.toggleNotifications();
+                break;
+            case NavbarUtilities.KEY_ACTION_POWER_MENU:
+                triggerVirtualKeypress(KeyEvent.KEYCODE_POWER, false, true);
+                break;
+            case NavbarUtilities.KEY_ACTION_SCREENSHOT:
+                com.android.internal.util.pixeldust.ActionUtils.takeScreenshot(true);
+                break;
+            case NavbarUtilities.KEY_ACTION_QS_PANEL:
+                com.android.internal.util.pixeldust.ActionUtils.toggleQsPanel();
                 break;
         }
     }
@@ -10466,7 +10493,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KeyEvent.KEYCODE_BACK:
             case KeyEvent.KEYCODE_MENU:
-                triggerVirtualKeypress(keyCode, false);
+                triggerVirtualKeypress(keyCode, false, false);
                 break;
             case KeyEvent.KEYCODE_ASSIST:
                 launchAssistAction(null, -1);
