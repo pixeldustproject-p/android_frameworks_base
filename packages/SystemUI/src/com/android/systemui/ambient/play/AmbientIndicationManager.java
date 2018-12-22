@@ -64,7 +64,7 @@ public class AmbientIndicationManager {
     private int lastAlarmInterval = 0;
     private long lastUpdated = 0;
     private boolean isRecognitionObserverBusy = false;
-    public boolean DEBUG = false;
+    public boolean DEBUG = true;
 
     /* Interval indicating when AP-Recognition will run. Default is 2 minutes */
     private int mAmbientRecognitionInterval = 120000;
