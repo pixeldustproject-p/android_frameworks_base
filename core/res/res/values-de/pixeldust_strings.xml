@@ -66,4 +66,11 @@
   <!-- back kill -->
   <string name="app_killed_message">Anwendung beendet</string>
 
+  <!-- [CHAR LIMIT=NONE] Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permlab_accessFontManager">Zugriff auf Schriftartenverwaltung</string>
+  <!-- [CHAR LIMIT=NONE] Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permdesc_accessFontManager">Erlaubt einer App den Zugriff auf die Schriftartenverwaltung.</string>
+  <!-- [CHAR LIMIT=NONE] Error when a package is installed but got the missing fonts.xml file, notifying the user why it isn't showing up. -->
+  <string name="fontservice_incompatible_font">Das installierte Schriftartenpaket ist nicht kompatibel, da die Datei fonts.xml fehlt. Bitte an den Paketentwickler wenden, um Unterstützung zu erhalten.</string>
+
 </resources>
