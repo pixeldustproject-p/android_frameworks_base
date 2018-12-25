@@ -5242,7 +5242,7 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         @Override
         public void startDozing() {
-            if (!mDozingRequested) {
+            if (!mDozingRequested && !isScreenTurningOnOrOn()) {
                 mDozingRequested = true;
                 DozeLog.traceDozing(mContext, mDozing);
                 updateDozing();
@@ -5303,6 +5303,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 DozeLog.traceDozing(mContext, mDozing);
                 mWakefulnessLifecycle.dispatchStartedWakingUp();
                 updateDozing();
+                updateScrimController();
             }
         }
 
