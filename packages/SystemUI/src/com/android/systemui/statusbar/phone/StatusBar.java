@@ -5601,7 +5601,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             super.onChange(selfChange, uri);
             if (uri.equals(Settings.System.getUriFor(
                     Settings.System.USE_OLD_MOBILETYPE))) {
-                mCommandQueue.restartUI();
+                updateTelephonyIcons();
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.QS_TILE_STYLE))) {
                 stockTileStyle();
@@ -5626,15 +5626,19 @@ public class StatusBar extends SystemUI implements DemoMode,
             final String blackString = Settings.System.getString(resolver,
                     Settings.System.HEADS_UP_BLACKLIST_VALUES);
             splitAndAddToArrayList(mBlacklist, blackString, "\\|");
-            USE_OLD_MOBILETYPE = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.USE_OLD_MOBILETYPE, 0,
-                    UserHandle.USER_CURRENT) != 0;
-            TelephonyIcons.updateIcons(USE_OLD_MOBILETYPE);
+            updateTelephonyIcons();
             setFpToDismissNotifications();
             setUseLessBoringHeadsUp();
             updateRecentsMode();
         }
 
+    }
+
+    private void updateTelephonyIcons() {
+        USE_OLD_MOBILETYPE = Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.USE_OLD_MOBILETYPE, 0,
+            UserHandle.USER_CURRENT) != 0;
+        TelephonyIcons.updateIcons(USE_OLD_MOBILETYPE);
     }
 
     private void setFpToDismissNotifications() {
