@@ -21,12 +21,7 @@ import static android.app.StatusBarManager.DISABLE_SYSTEM_INFO;
 import android.annotation.Nullable;
 import android.app.Fragment;
 import android.app.StatusBarManager;
-import android.content.ContentResolver;
-import android.database.ContentObserver;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.UserHandle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +34,6 @@ import com.android.systemui.R;
 import com.android.systemui.SysUiServiceProvider;
 import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.phone.StatusBarIconController.DarkIconManager;
-import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.statusbar.policy.DarkIconDispatcher;
 import com.android.systemui.statusbar.policy.EncryptionHelper;
 import com.android.systemui.statusbar.policy.KeyguardMonitor;
@@ -62,35 +56,12 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private KeyguardMonitor mKeyguardMonitor;
     private NetworkController mNetworkController;
     private LinearLayout mSystemIconArea;
-    private Clock mClockView;
-    private View mRightClock;
-    private int mClockStyle;
+    private View mClockView;
     private View mNotificationIconAreaInner;
     private int mDisabled1;
     private StatusBar mStatusBarComponent;
     private DarkIconManager mDarkIconManager;
     private View mOperatorNameFrame;
-    private LinearLayout mCenterClockLayout;
-    private final Handler mHandler = new Handler();
-
-    private class SettingsObserver extends ContentObserver {
-       SettingsObserver(Handler handler) {
-           super(handler);
-       }
-
-       void observe() {
-         mContentResolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUSBAR_CLOCK_STYLE),
-                    false, this, UserHandle.USER_ALL);
-       }
-
-       @Override
-       public void onChange(boolean selfChange) {
-           updateSettings(true);
-       }
-    }
-    private SettingsObserver mSettingsObserver = new SettingsObserver(mHandler);
-    private ContentResolver mContentResolver;
 
     private SignalCallback mSignalCallback = new SignalCallback() {
         @Override
@@ -102,11 +73,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContentResolver = getContext().getContentResolver();
         mKeyguardMonitor = Dependency.get(KeyguardMonitor.class);
         mNetworkController = Dependency.get(NetworkController.class);
         mStatusBarComponent = SysUiServiceProvider.getComponent(getContext(), StatusBar.class);
-        mSettingsObserver.observe();
     }
 
     @Override
@@ -126,11 +95,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mDarkIconManager.setShouldLog(true);
         Dependency.get(StatusBarIconController.class).addIconGroup(mDarkIconManager);
         mSystemIconArea = mStatusBar.findViewById(R.id.system_icon_area);
-        mClockView = (Clock) mStatusBar.findViewById(R.id.clock);
-        mCenterClockLayout = (LinearLayout) mStatusBar.findViewById(R.id.center_clock_layout);
-        mRightClock = mStatusBar.findViewById(R.id.right_clock);
-        updateSettings(false);
+        mClockView = mStatusBar.findViewById(R.id.clock);
         showSystemIconArea(false);
+        showClock(false);
         initEmergencyCryptkeeperText();
         initOperatorName();
     }
@@ -194,10 +161,17 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         if ((diff1 & DISABLE_NOTIFICATION_ICONS) != 0) {
             if ((state1 & DISABLE_NOTIFICATION_ICONS) != 0) {
                 hideNotificationIconArea(animate);
-                animateHide(mClockView, animate, false);
             } else {
                 showNotificationIconArea(animate);
-                updateClockStyle(animate);
+            }
+        }
+        // The clock may have already been hidden, but we might want to shift its
+        // visibility to GONE from INVISIBLE or vice versa
+        if ((diff1 & DISABLE_CLOCK) != 0 || mClockView.getVisibility() != clockHiddenMode()) {
+            if ((state1 & DISABLE_CLOCK) != 0) {
+                hideClock(animate);
+            } else {
+                showClock(animate);
             }
         }
     }
@@ -232,37 +206,38 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     }
 
     public void hideSystemIconArea(boolean animate) {
-        animateHide(mSystemIconArea, animate, true);
-        if (mClockView.isClockVisible()) {
-            animateHide(mCenterClockLayout, animate, true);
-            if (mClockStyle == 2) {
-                animateHide(mRightClock, animate, true);
-            }
-        }
+        animateHide(mSystemIconArea, animate);
     }
 
     public void showSystemIconArea(boolean animate) {
         animateShow(mSystemIconArea, animate);
-        if (mClockView.isClockVisible()) {
-            animateShow(mCenterClockLayout, animate);
-            if (mClockStyle == 2) {
-                animateShow(mRightClock, animate);
-            }
+    }
+
+    public void hideClock(boolean animate) {
+        animateHiddenState(mClockView, clockHiddenMode(), animate);
+    }
+
+    public void showClock(boolean animate) {
+        animateShow(mClockView, animate);
+    }
+
+    /**
+     * If panel is expanded/expanding it usually means QS shade is opening, so
+     * don't set the clock GONE otherwise it'll mess up the animation.
+     */
+    private int clockHiddenMode() {
+        if (!mStatusBar.isClosed() && !mKeyguardMonitor.isShowing()) {
+            return View.INVISIBLE;
         }
+        return View.GONE;
     }
 
     public void hideNotificationIconArea(boolean animate) {
-        animateHide(mNotificationIconAreaInner, animate, true);
-        if (mClockView.isClockVisible()) {
-            animateHide(mCenterClockLayout, animate, true);
-        }
+        animateHide(mNotificationIconAreaInner, animate);
     }
 
     public void showNotificationIconArea(boolean animate) {
         animateShow(mNotificationIconAreaInner, animate);
-        if (mClockView.isClockVisible()) {
-            animateShow(mCenterClockLayout, animate);
-        }
     }
 
     public void hideOperatorName(boolean animate) {
@@ -293,7 +268,14 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                 .setDuration(160)
                 .setStartDelay(0)
                 .setInterpolator(Interpolators.ALPHA_OUT)
-                .withEndAction(() -> v.setVisibility(invisible ? View.INVISIBLE : View.GONE));
+                .withEndAction(() -> v.setVisibility(state));
+    }
+
+    /**
+     * Hides a view.
+     */
+    private void animateHide(final View v, boolean animate) {
+        animateHiddenState(v, View.INVISIBLE, animate);
     }
 
     /**
@@ -344,21 +326,6 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         if (getResources().getBoolean(R.bool.config_showOperatorNameInStatusBar)) {
             ViewStub stub = mStatusBar.findViewById(R.id.operator_name);
             mOperatorNameFrame = stub.inflate();
-        }
-    }
-
-    public void updateSettings(boolean animate) {
-        mClockStyle = Settings.System.getIntForUser(mContentResolver,
-                Settings.System.STATUSBAR_CLOCK_STYLE, 0, UserHandle.USER_CURRENT);
-        updateClockStyle(animate);
-    }
-
-    private void updateClockStyle(boolean animate) {
-        if (!mClockView.isClockVisible()) return;
-        if (mClockStyle == 1 || mClockStyle == 2) {
-            animateHide(mClockView, animate, false);
-        } else {
-            animateShow(mClockView, animate);
         }
     }
 }
