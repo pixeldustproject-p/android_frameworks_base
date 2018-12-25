@@ -22,8 +22,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -38,33 +38,36 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.android.internal.util.pixeldust.PixeldustUtils;
-import com.android.systemui.R;
+import android.util.Log;
 
 import com.android.internal.util.pixeldust.ambient.play.AmbientPlayHistoryManager;
 import com.android.internal.util.pixeldust.ambient.play.AmbientPlayProvider.Observable;
+import com.android.internal.util.pixeldust.ambient.play.AmbientPlayQuietPeriod;
+import com.android.systemui.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AmbientIndicationManager {
 
     private static final String TAG = "AmbientIndicationManager";
     private Context mContext;
     private ContentResolver mContentResolver;
-    private boolean isRecognitionSupported;
-    private boolean isRecognitionEnabled;
-    private boolean isRecognitionEnabledOnKeyguard;
-    private boolean isRecognitionNotificationEnabled;
+    private boolean mIsRecognitionSupported;
+    private boolean mIsRecognitionEnabled;
+    private boolean mIsRecognitionEnabledOnKeyguard;
+    private boolean mIsRecognitionNotificationEnabled;
+    private boolean mLowBatteryRestrictionEnabled;
+    private boolean mMobileDataRestrictionEnabled;
     private RecognitionObserver mRecognitionObserver;
     private String ACTION_UPDATE_AMBIENT_INDICATION = "update_ambient_indication";
     private AlarmManager mAlarmManager;
-    private BatteryManager mBatteryManager;
-    private int NO_MATCH_COUNT = 0;
     private int lastAlarmInterval = 0;
     private long lastUpdated = 0;
     private boolean isRecognitionObserverBusy = false;
+    private boolean mIsBatteryLow = false;
+    private int mCurrentNetworkStatus = -1;
+    private AmbientPlayQuietPeriod mAmbientPlayQuietPeriod;
     public boolean DEBUG = true;
 
     /* Interval indicating when AP-Recognition will run. Default is 2 minutes */
@@ -72,10 +75,35 @@ public class AmbientIndicationManager {
 
     private List<AmbientIndicationManagerCallback> mCallbacks;
 
-    private boolean needsUpdate() {
-        if (!isRecognitionEnabled || !isRecognitionSupported) {
+    public boolean isRecognitionEnabled() {
+        if (!mIsRecognitionEnabled || !mIsRecognitionSupported) {
+            updateAmbientPlayAlarm(true);
             return false;
         }
+        if (mCurrentNetworkStatus == -1) {
+            updateAmbientPlayAlarm(true);
+            if (DEBUG) Log.d(TAG, "Disabling recognition due to no network available");
+            return false;
+        }
+        if (mLowBatteryRestrictionEnabled && mIsBatteryLow) {
+            updateAmbientPlayAlarm(true);
+            if (DEBUG) Log.d(TAG, "Disabling recognition due to low battery restriction");
+            return false;
+        }
+        if (mMobileDataRestrictionEnabled && mCurrentNetworkStatus == 1) {
+            updateAmbientPlayAlarm(true);
+            if (DEBUG) Log.d(TAG, "Disabling recognition due to mobile data restriction");
+            return false;
+        }
+        if (mAmbientPlayQuietPeriod.isOnPeriod()) {
+            updateAmbientPlayAlarm(true);
+            if (DEBUG) Log.d(TAG, "Disabling recognition due to quiet period");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean needsUpdate() {
         return System.currentTimeMillis() - lastUpdated > lastAlarmInterval;
     }
 
@@ -87,36 +115,44 @@ public class AmbientIndicationManager {
             return;
         }
         lastAlarmInterval = 0;
-        if (!isRecognitionEnabled || !isRecognitionSupported) return;
-        int networkStatus = PixeldustUtils.isConnectionAvailable(mContext);
-        int duration = 120000; // Default
-
-        /*
-         * Let's try to reduce battery consumption here.
-         *  - If device is charging OR if device is on WiFi then let's not worry about a high scan interval and stick to the user-defined interval, else
-         *  - If device is not able to find matches for 20 consecutive times.
-         *    then chances are that user is probably not listening to music or maybe sleeping
-         *    So, Bump the scan interval to 5 minutes, else
-         *  - If device is on Mobile Data or anything else then let's force it to 3 minutes.
-         */
-
-        if (mBatteryManager.isCharging() || (networkStatus == 0)) {
-            duration = mAmbientRecognitionInterval;
-        } else if (NO_MATCH_COUNT >= 20) {
-            duration = 300000;
-        } else if (networkStatus == 1 || networkStatus == 2) {
-            duration = 180000;
-        }
+        if (!isRecognitionEnabled()) return;
+        int duration = mAmbientRecognitionInterval;
         lastAlarmInterval = duration;
         mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + duration, pendingIntent);
     }
 
-    public int getRecordingMaxTime(){
+    public int getRecordingMaxTime() {
         return 10000; // 10 seconds
     }
 
-    public int getAmbientClearViewInterval(){
-        return 180000; // Interval to clean the view after song is detected. (Default 3 minutes)
+    public int getAmbientClearViewInterval() {
+        return 120000; // Interval to clean the view after song is detected. (Default 2 minutes)
+    }
+
+    private void updateNetworkStatus() {
+        final ConnectivityManager connectivityManager
+                = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        final Network network = connectivityManager.getActiveNetwork();
+        final NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
+        /*
+         * Return -1 if We don't have any network connectivity
+         * Return 0 if we are on WiFi  (desired)
+         * Return 1 if we are on MobileData (Little less desired)
+         * Return 2 if not sure which connection is user on but has network connectivity
+         */
+        // NetworkInfo object will return null in case device is in flight mode.
+        if (activeNetworkInfo == null) {
+            mCurrentNetworkStatus = -1;
+        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            mCurrentNetworkStatus = 0;
+        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+            mCurrentNetworkStatus = 1;
+        } else if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
+            mCurrentNetworkStatus = 2;
+        } else {
+            mCurrentNetworkStatus = -1;
+        }
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -126,29 +162,41 @@ public class AmbientIndicationManager {
                 return;
             }
             if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction()) || Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
-                if (needsUpdate()) {
-                    updateAmbientPlayAlarm(true);
-                    startRecording();
-                }
+                startRecordingIfNecessary(true);
             } else if (ACTION_UPDATE_AMBIENT_INDICATION.equals(intent.getAction())) {
-                updateAmbientPlayAlarm(true);
-                startRecording();
+                startRecordingIfNecessary(false);
             } else if (Intent.ACTION_TIME_CHANGED.equals(intent.getAction()) || Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
                 lastUpdated = 0;
                 lastAlarmInterval = 0;
                 updateAmbientPlayAlarm(false);
+            } else if (Intent.ACTION_BATTERY_OKAY.equals(intent.getAction())) {
+                boolean mIsBatteryLow_ = mIsBatteryLow;
+                mIsBatteryLow = false;
+                startRecordingIfNecessary(true);
+            } else if (Intent.ACTION_BATTERY_LOW.equals(intent.getAction())) {
+                boolean mIsBatteryLow_ = mIsBatteryLow;
+                mIsBatteryLow = true;
+                startRecordingIfNecessary(true);
+            } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                int mCurrentNetworkStatus_ = mCurrentNetworkStatus;
+                updateNetworkStatus();
+                if (mCurrentNetworkStatus_ != mCurrentNetworkStatus) {
+                    startRecordingIfNecessary(true);
+                }
             }
         }
     };
 
     public AmbientIndicationManager(Context context) {
         mContext = context;
+        updateNetworkStatus();
+        mIsBatteryLow = isBatteryLevelLow();
+        mAmbientPlayQuietPeriod = new AmbientPlayQuietPeriod(context);
         mCallbacks = new ArrayList<>();
         mContentResolver = context.getContentResolver();
-        isRecognitionSupported = mContext.getResources().getBoolean(
+        mIsRecognitionSupported = mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_supportAmbientRecognition);
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        mBatteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
         mSettingsObserver = new SettingsObserver(new Handler());
         mSettingsObserver.observe();
         mSettingsObserver.update();
@@ -159,13 +207,28 @@ public class AmbientIndicationManager {
         filter.addAction(Intent.ACTION_TIME_CHANGED);
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         filter.addAction(ACTION_UPDATE_AMBIENT_INDICATION);
+        filter.addAction(Intent.ACTION_BATTERY_LOW);
+        filter.addAction(Intent.ACTION_BATTERY_OKAY);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
         context.registerReceiver(broadcastReceiver, filter);
     }
 
-    private void startRecording(){
-        if (!isRecognitionObserverBusy && isRecognitionEnabled && isRecognitionSupported){
+    private boolean isBatteryLevelLow() {
+        Intent batteryStatus = mContext.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        return batteryStatus.getBooleanExtra(BatteryManager.EXTRA_BATTERY_LOW, false);
+    }
+
+    private void startRecordingIfNecessary(boolean check) {
+        if (!isRecognitionEnabled()) {
+            return;
+        }
+        if (check && !needsUpdate()){
+            return;
+        }
+        if (!isRecognitionObserverBusy) {
             isRecognitionObserverBusy = true;
+            updateAmbientPlayAlarm(true);
             mRecognitionObserver.startRecording();
         }
     }
@@ -177,6 +240,7 @@ public class AmbientIndicationManager {
     }
 
     private SettingsObserver mSettingsObserver;
+
     private class SettingsObserver extends ContentObserver {
         SettingsObserver(Handler handler) {
             super(handler);
@@ -192,6 +256,12 @@ public class AmbientIndicationManager {
             mContentResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.AMBIENT_RECOGNITION_NOTIFICATION),
                     false, this, UserHandle.USER_ALL);
+            mContentResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.AMBIENT_RECOGNITION_SAVING_OPTIONS_LOW_BATTERY),
+                    false, this, UserHandle.USER_ALL);
+            mContentResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.AMBIENT_RECOGNITION_SAVING_OPTIONS_MOBILE_DATA),
+                    false, this, UserHandle.USER_ALL);
         }
 
         void unregister() {
@@ -205,24 +275,28 @@ public class AmbientIndicationManager {
             if (uri.equals(Settings.System.getUriFor(Settings.System.AMBIENT_RECOGNITION))) {
                 lastUpdated = 0;
                 lastAlarmInterval = 0;
-                dispatchSettingsChanged(Settings.System.AMBIENT_RECOGNITION, isRecognitionEnabled);
+                dispatchSettingsChanged(Settings.System.AMBIENT_RECOGNITION, isRecognitionEnabled());
                 updateAmbientPlayAlarm(false);
             } else if (uri.equals(Settings.System.getUriFor(Settings.System.AMBIENT_RECOGNITION_KEYGUARD))) {
-                dispatchSettingsChanged(Settings.System.AMBIENT_RECOGNITION_KEYGUARD, isRecognitionEnabledOnKeyguard);
+                dispatchSettingsChanged(Settings.System.AMBIENT_RECOGNITION_KEYGUARD, mIsRecognitionEnabledOnKeyguard);
             } else if (uri.equals(Settings.System.getUriFor(Settings.System.AMBIENT_RECOGNITION_NOTIFICATION))) {
-                dispatchSettingsChanged(Settings.System.AMBIENT_RECOGNITION_NOTIFICATION, isRecognitionNotificationEnabled);
+                dispatchSettingsChanged(Settings.System.AMBIENT_RECOGNITION_NOTIFICATION, mIsRecognitionNotificationEnabled);
             }
         }
 
         public void update() {
-            isRecognitionEnabled = Settings.System.getIntForUser(mContentResolver,
+            mIsRecognitionEnabled = Settings.System.getIntForUser(mContentResolver,
                     Settings.System.AMBIENT_RECOGNITION, 0, UserHandle.USER_CURRENT) != 0;
-            isRecognitionEnabledOnKeyguard = Settings.System.getIntForUser(mContentResolver,
+            mIsRecognitionEnabledOnKeyguard = Settings.System.getIntForUser(mContentResolver,
                     Settings.System.AMBIENT_RECOGNITION_KEYGUARD, 1, UserHandle.USER_CURRENT) != 0;
-            isRecognitionNotificationEnabled = Settings.System.getIntForUser(mContentResolver,
+            mIsRecognitionNotificationEnabled = Settings.System.getIntForUser(mContentResolver,
                     Settings.System.AMBIENT_RECOGNITION_NOTIFICATION, 1, UserHandle.USER_CURRENT) != 0;
             mAmbientRecognitionInterval = Settings.System.getIntForUser(mContentResolver,
                     Settings.System.AMBIENT_RECOGNITION_INTERVAL, 120000, UserHandle.USER_CURRENT);
+            mLowBatteryRestrictionEnabled = Settings.System.getIntForUser(mContentResolver,
+                    Settings.System.AMBIENT_RECOGNITION_SAVING_OPTIONS_LOW_BATTERY, 1, UserHandle.USER_CURRENT) != 0;
+            mMobileDataRestrictionEnabled = Settings.System.getIntForUser(mContentResolver,
+                    Settings.System.AMBIENT_RECOGNITION_SAVING_OPTIONS_MOBILE_DATA, 0, UserHandle.USER_CURRENT) != 0;
         }
     }
 
@@ -232,20 +306,19 @@ public class AmbientIndicationManager {
 
     public void registerCallback(AmbientIndicationManagerCallback callback) {
         mCallbacks.add(callback);
-        callback.onSettingsChanged(Settings.System.AMBIENT_RECOGNITION, isRecognitionEnabled);
-        callback.onSettingsChanged(Settings.System.AMBIENT_RECOGNITION_KEYGUARD, isRecognitionEnabledOnKeyguard);
-        callback.onSettingsChanged(Settings.System.AMBIENT_RECOGNITION_NOTIFICATION, isRecognitionNotificationEnabled);
+        callback.onSettingsChanged(Settings.System.AMBIENT_RECOGNITION, isRecognitionEnabled());
+        callback.onSettingsChanged(Settings.System.AMBIENT_RECOGNITION_KEYGUARD, mIsRecognitionEnabledOnKeyguard);
+        callback.onSettingsChanged(Settings.System.AMBIENT_RECOGNITION_NOTIFICATION, mIsRecognitionNotificationEnabled);
     }
 
     public void dispatchRecognitionResult(Observable observed) {
         isRecognitionObserverBusy = false;
         lastUpdated = System.currentTimeMillis();
-        NO_MATCH_COUNT = 0;
-        if (!isRecognitionEnabled) {
+        if (!isRecognitionEnabled()) {
             dispatchRecognitionNoResult();
             return;
         }
-        if (isRecognitionNotificationEnabled) {
+        if (mIsRecognitionNotificationEnabled) {
             showNotification(observed.Song, observed.Artist);
         }
         AmbientPlayHistoryManager.addSong(observed.Song, observed.Artist, mContext);
@@ -262,11 +335,6 @@ public class AmbientIndicationManager {
     public void dispatchRecognitionNoResult() {
         isRecognitionObserverBusy = false;
         lastUpdated = System.currentTimeMillis();
-        if (!mBatteryManager.isCharging()){
-            NO_MATCH_COUNT++;
-        }else{
-            NO_MATCH_COUNT = 0;
-        }
         for (AmbientIndicationManagerCallback cb : mCallbacks) {
             try {
                 cb.onRecognitionNoResult();
@@ -279,11 +347,6 @@ public class AmbientIndicationManager {
     public void dispatchRecognitionError() {
         isRecognitionObserverBusy = false;
         lastUpdated = System.currentTimeMillis();
-        if (!mBatteryManager.isCharging()){
-            NO_MATCH_COUNT++;
-        }else{
-            NO_MATCH_COUNT = 0;
-        }
         for (AmbientIndicationManagerCallback cb : mCallbacks) {
             try {
                 cb.onRecognitionError();

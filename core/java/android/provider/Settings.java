@@ -4477,7 +4477,7 @@ public final class Settings {
          */
         public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
 
-         /**
+        /**
          * Show or hide clock
          * 0 - hide
          * 1 - show (default)
@@ -4584,6 +4584,61 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_CLOCK_FONT_STYLE = "status_bar_clock_font_style";
+
+        /**
+         * Ambient Play saving options: Low battery
+         *
+         * @hide
+         */
+        public static final String AMBIENT_RECOGNITION_SAVING_OPTIONS_LOW_BATTERY = "ambient_recognition_saving_options_low_battery";
+
+        /** @hide */
+        private static final Validator AMBIENT_RECOGNITION_SAVING_OPTIONS_LOW_BATTERY_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /**
+         * Ambient Play saving options: Mobile data
+         *
+         * @hide
+         */
+        public static final String AMBIENT_RECOGNITION_SAVING_OPTIONS_MOBILE_DATA = "ambient_recognition_saving_options_mobile_data";
+
+        /** @hide */
+        private static final Validator AMBIENT_RECOGNITION_SAVING_OPTIONS_MOBILE_DATA_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /**
+         * Ambient Play saving options: Quiet period
+         *
+         * @hide
+         */
+        public static final String AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD = "ambient_recognition_saving_options_quiet_period";
+
+        /** @hide */
+        private static final Validator AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /**
+         * Ambient Play saving options: Quiet period start time
+         *
+         * @hide
+         */
+        public static final String AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_START_TIME = "ambient_recognition_saving_options_quiet_period_start_time";
+
+        /** @hide */
+        private static final Validator AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_START_TIME_VALIDATOR =
+                NON_NEGATIVE_INTEGER_VALIDATOR;
+
+        /**
+         * Ambient Play saving options: Quiet period end time
+         *
+         * @hide
+         */
+        public static final String AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_END_TIME = "ambient_recognition_saving_options_quiet_period_end_time";
+
+        /** @hide */
+        private static final Validator AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_END_TIME_VALIDATOR =
+                NON_NEGATIVE_INTEGER_VALIDATOR;
 
         /**
          * Indicates whether ANBI (Accidental navigation button interaction) is enabled.
@@ -5751,6 +5806,11 @@ public final class Settings {
             PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_KEYGUARD);
             PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_NOTIFICATION);
             PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_INTERVAL);
+            PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_SAVING_OPTIONS_LOW_BATTERY);
+            PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_SAVING_OPTIONS_MOBILE_DATA);
+            PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD);
+            PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_START_TIME);
+            PRIVATE_SETTINGS.add(AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_END_TIME);
             PRIVATE_SETTINGS.add(WEATHER_LOCKSCREEN_UNIT);
             PRIVATE_SETTINGS.add(DEVICE_INTRODUCTION_COMPLETED);
             PRIVATE_SETTINGS.add(USE_SLIM_RECENTS);
@@ -5898,6 +5958,11 @@ public final class Settings {
             VALIDATORS.put(AMBIENT_RECOGNITION_KEYGUARD, AMBIENT_RECOGNITION_KEYGUARD_VALIDATOR);
             VALIDATORS.put(AMBIENT_RECOGNITION_NOTIFICATION, AMBIENT_RECOGNITION_NOTIFICATION_VALIDATOR);
             VALIDATORS.put(AMBIENT_RECOGNITION_INTERVAL, AMBIENT_RECOGNITION_INTERVAL_VALIDATOR);
+            VALIDATORS.put(AMBIENT_RECOGNITION_SAVING_OPTIONS_LOW_BATTERY, AMBIENT_RECOGNITION_SAVING_OPTIONS_LOW_BATTERY_VALIDATOR);
+            VALIDATORS.put(AMBIENT_RECOGNITION_SAVING_OPTIONS_MOBILE_DATA, AMBIENT_RECOGNITION_SAVING_OPTIONS_MOBILE_DATA_VALIDATOR);
+            VALIDATORS.put(AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD, AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_VALIDATOR);
+            VALIDATORS.put(AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_START_TIME, AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_START_TIME_VALIDATOR);
+            VALIDATORS.put(AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_END_TIME, AMBIENT_RECOGNITION_SAVING_OPTIONS_QUIET_PERIOD_END_TIME_VALIDATOR);
             VALIDATORS.put(WEATHER_LOCKSCREEN_UNIT, WEATHER_LOCKSCREEN_UNIT_VALIDATOR);
             VALIDATORS.put(DEVICE_INTRODUCTION_COMPLETED, DEVICE_INTRODUCTION_COMPLETED_VALIDATOR);
             VALIDATORS.put(USE_SLIM_RECENTS, USE_SLIM_RECENTS_VALIDATOR);
