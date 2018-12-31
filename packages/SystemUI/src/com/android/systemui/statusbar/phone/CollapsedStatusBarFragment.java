@@ -73,6 +73,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private View mOperatorNameFrame;
     private final Handler mHandler = new Handler();
     private ContentResolver mContentResolver;
+    private boolean mShowClock = true;
 
     private class SettingsObserver extends ContentObserver {
        SettingsObserver(Handler handler) {
@@ -80,6 +81,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
        }
 
        void observe() {
+         mContentResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_CLOCK),
+                    false, this, UserHandle.USER_ALL);
          mContentResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUSBAR_CLOCK_STYLE),
                     false, this, UserHandle.USER_ALL);
@@ -347,8 +351,17 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     }
 
     public void updateSettings(boolean animate) {
-        mClockStyle = Settings.System.getIntForUser(mContentResolver,
-                Settings.System.STATUSBAR_CLOCK_STYLE, 0, UserHandle.USER_CURRENT);
+        mShowClock = Settings.System.getIntForUser(mContentResolver,
+                Settings.System.STATUS_BAR_CLOCK, 1,
+                UserHandle.USER_CURRENT) == 1;
+        if (!mShowClock) {
+            mClockStyle = 1; // internally switch to centered clock layout because
+                             // left & right will show up again after QS pulldown
+        } else {
+            mClockStyle = Settings.System.getIntForUser(mContentResolver,
+                    Settings.System.STATUSBAR_CLOCK_STYLE, 0, 
+                    UserHandle.USER_CURRENT);
+        }
         updateClockStyle(animate);
     }
 

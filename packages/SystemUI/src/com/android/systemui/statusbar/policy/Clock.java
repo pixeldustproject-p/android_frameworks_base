@@ -294,8 +294,8 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
     }
 
     protected void updateClockVisibility() {
-        boolean visible = mClockStyle == STYLE_CLOCK_LEFT && mShowClock
-                && mClockVisibleByPolicy && mClockVisibleByUser;
+        boolean visible = ((mClockStyle == STYLE_CLOCK_LEFT) || (mQsHeader))
+                && mShowClock && mClockVisibleByPolicy && mClockVisibleByUser;
         Dependency.get(IconLogger.class).onIconVisibility("clock", visible);
         int visibility = visible ? View.VISIBLE : View.GONE;
         setVisibility(visibility);
@@ -577,9 +577,14 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
                 Settings.System.STATUS_BAR_CLOCK_SECONDS, 0,
                 UserHandle.USER_CURRENT) == 1;
 
-        mClockStyle = Settings.System.getIntForUser(resolver,
-                Settings.System.STATUSBAR_CLOCK_STYLE, STYLE_CLOCK_LEFT,
-                UserHandle.USER_CURRENT);
+        if (!mShowClock) {
+            mClockStyle = 1; // internally switch to centered clock layout because
+                             // left & right will show up again after QS pulldown
+        } else {
+            mClockStyle = Settings.System.getIntForUser(resolver,
+                    Settings.System.STATUSBAR_CLOCK_STYLE, STYLE_CLOCK_LEFT,
+                    UserHandle.USER_CURRENT);
+        }
 
         boolean is24hour = DateFormat.is24HourFormat(mContext);
         int amPmStyle = Settings.System.getIntForUser(resolver,
