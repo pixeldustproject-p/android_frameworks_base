@@ -240,19 +240,16 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         animateHide(mCenterClockLayout, animate, true);
         if (mClockStyle == 2) {
             animateHide(mRightClock, animate, true);
-        } else if (mClockStyle == 0) {
-            if (((Clock)mClockView).isClockVisible()) {
-                animateHide(mSystemIconArea, animate, true);
-            }
         }
+        animateHide(mSystemIconArea, animate, true);
     }
 
     public void showSystemIconArea(boolean animate) {
-        animateShow(mSystemIconArea, animate);
         animateShow(mCenterClockLayout, animate);
         if (mClockStyle == 2) {
             animateShow(mRightClock, animate);
         }
+        animateShow(mSystemIconArea, animate);
     }
 
     public void hideNotificationIconArea(boolean animate) {
