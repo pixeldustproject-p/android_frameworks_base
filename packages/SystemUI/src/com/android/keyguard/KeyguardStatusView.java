@@ -294,12 +294,12 @@ public class KeyguardStatusView extends GridLayout implements
     @Override
     public void onDensityOrFontScaleChanged() {
         mWidgetPadding = getResources().getDimension(R.dimen.widget_vertical_padding);
-        Typeface tfLight = Typeface.create(FONT_FAMILY_LIGHT, Typeface.NORMAL);
+        //Typeface tfLight = Typeface.create(FONT_FAMILY_LIGHT, Typeface.NORMAL);
         Typeface tfMedium = Typeface.create(FONT_FAMILY_MEDIUM, Typeface.NORMAL);
         if (mClockView != null) {
             mClockView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     getResources().getDimensionPixelSize(R.dimen.widget_big_font_size));
-            mClockView.setTypeface(tfLight);
+            //mClockView.setTypeface(tfLight);
             mClockView.getPaint().setStrokeWidth(
                     getResources().getDimensionPixelSize(R.dimen.widget_small_font_stroke));
         }
