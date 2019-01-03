@@ -635,6 +635,9 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
                 Settings.System.STATUSBAR_CLOCK_DATE_STYLE, CLOCK_DATE_STYLE_REGULAR,
                 UserHandle.USER_CURRENT);
 
+        mClockDateFormat = Settings.System.getString(resolver,
+                Settings.System.STATUSBAR_CLOCK_DATE_FORMAT);
+
         mClockDatePosition = Settings.System.getIntForUser(resolver,
                 Settings.System.STATUSBAR_CLOCK_DATE_POSITION, STYLE_DATE_LEFT,
                 UserHandle.USER_CURRENT);
