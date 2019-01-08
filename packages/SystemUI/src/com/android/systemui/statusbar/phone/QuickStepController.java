@@ -60,7 +60,7 @@ import com.android.systemui.plugins.statusbar.phone.NavGesture.GestureHelper;
 import com.android.systemui.shared.recents.IOverviewProxy;
 import com.android.systemui.shared.recents.utilities.Utilities;
 import com.android.systemui.shared.system.NavigationBarCompat;
-import com.android.internal.util.pixeldust.PixeldustUtils;
+import com.android.internal.util.pixeldust.ActionUtils;
 
 /**
  * Class to detect gestures on the navigation bar and implement quick scrub.
@@ -267,7 +267,7 @@ public class QuickStepController implements GestureHelper {
                     int deltaX = (int) mPreviousUpEventX - (int) event.getX();
                     int deltaY = (int) mPreviousUpEventY - (int) event.getY();
                     boolean isDoubleTapReally = deltaX * deltaX + deltaY * deltaY < sDoubleTapSquare;
-                    if (isDoubleTapReally) PixeldustUtils.switchScreenOff(mContext);
+                    if (isDoubleTapReally) ActionUtils.switchScreenOff(mContext);
                 } else {
                     // this is the first tap, let's go further and schedule a
                     // mDoubleTapCancelTimeout call in the action up event so after the set time
@@ -396,7 +396,7 @@ public class QuickStepController implements GestureHelper {
                     }
                     if (mBackActionScheduled) {
                         endQuickScrub(true /* animate */);
-                        PixeldustUtils.sendKeycode(KeyEvent.KEYCODE_BACK, mHandler);
+                        ActionUtils.sendKeycode(KeyEvent.KEYCODE_BACK, mHandler);
                         mNavigationBarView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                     } else {
                         endQuickScrub(true /* animate */);
@@ -424,7 +424,7 @@ public class QuickStepController implements GestureHelper {
             isDoubleTapPending = false;
             // it was a single tap, let's trigger the home button action
             mHandler.removeCallbacksAndMessages(null);
-            PixeldustUtils.sendKeycode(KeyEvent.KEYCODE_HOME, mHandler);
+            ActionUtils.sendKeycode(KeyEvent.KEYCODE_HOME, mHandler);
         }
     };
 
@@ -454,8 +454,8 @@ public class QuickStepController implements GestureHelper {
                 moveKbCursor(right, false);
             }
         };
-        PixeldustUtils.moveKbCursor(KeyEvent.ACTION_UP, right);
-        PixeldustUtils.moveKbCursor(KeyEvent.ACTION_DOWN, right);
+        ActionUtils.moveKbCursor(KeyEvent.ACTION_UP, right);
+        ActionUtils.moveKbCursor(KeyEvent.ACTION_DOWN, right);
         mHandler.postDelayed(r, firstTrigger ? 500 : 250);
     }
 

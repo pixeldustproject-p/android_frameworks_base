@@ -61,6 +61,7 @@ import android.widget.FrameLayout;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.internal.widget.LockPatternUtils;
+import com.android.internal.util.pixeldust.ActionUtils;
 import com.android.keyguard.KeyguardStatusView;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.systemui.DejankUtils;
@@ -331,9 +332,7 @@ public class NotificationPanelView extends PanelView implements
         mDoubleTapGesture = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-                if(pm != null)
-                    pm.goToSleep(e.getEventTime());
+                ActionUtils.switchScreenOff(mContext);
                 // quick pulldown can trigger those values
                 // on double tap - so reset them
                 mQsExpandImmediate = false;

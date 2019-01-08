@@ -36,55 +36,30 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.fingerprint.FingerprintManager;
-import android.hardware.input.InputManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.Manifest;
-import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.PowerManager;
 import android.os.Process;
 import android.os.RemoteException;
-import android.os.ServiceManager;
-import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.UserHandle;
-import android.view.InputDevice;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
 import android.view.IWindowManager;
 import android.view.WindowManagerGlobal;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.android.internal.R;
-import com.android.internal.statusbar.IStatusBarService;
 
 import java.util.List;
 import java.util.Arrays;
 import java.util.Locale;
 
 public class PixeldustUtils {
-
-    public static final String INTENT_SCREENSHOT = "action_handler_screenshot";
-    public static final String INTENT_REGION_SCREENSHOT = "action_handler_region_screenshot";
-
-    private static IStatusBarService mStatusBarService = null;
-
-    private static IStatusBarService getStatusBarService() {
-        synchronized (PixeldustUtils.class) {
-            if (mStatusBarService == null) {
-                mStatusBarService = IStatusBarService.Stub.asInterface(
-                        ServiceManager.getService("statusbar"));
-            }
-            return mStatusBarService;
-        }
-    }
 
     public static boolean isChineseLanguage() {
        return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
@@ -199,41 +174,15 @@ public class PixeldustUtils {
         return false;
     }
 
-    public static void switchScreenOff(Context ctx) {
-        PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
-        if (pm!= null) {
-            pm.goToSleep(SystemClock.uptimeMillis());
-        }
-    }
-
 	public static boolean deviceHasCompass(Context ctx) {
         SensorManager sm = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
         return sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null
                 && sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null;
     }
 
+    // Flashlight
     public static boolean deviceHasFlashlight(Context ctx) {
         return ctx.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-    }
-
-    public static void toggleCameraFlash() {
-        IStatusBarService service = getStatusBarService();
-        if (service != null) {
-            try {
-                service.toggleCameraFlash();
-            } catch (RemoteException e) {
-                // do nothing.
-            }
-        }
-    }
-
-    public static void takeScreenshot(boolean full) {
-        IWindowManager wm = WindowManagerGlobal.getWindowManagerService();
-        try {
-            wm.sendCustomAction(new Intent(full? INTENT_SCREENSHOT : INTENT_REGION_SCREENSHOT));
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
     }
 
     public static ActivityInfo getRunningActivityInfo(Context context) {
@@ -285,16 +234,21 @@ public class PixeldustUtils {
 
     // Check to see if device supports the Fingerprint scanner
     public static boolean hasFingerprintSupport(Context context) {
-        FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
-        return context.getApplicationContext().checkSelfPermission(Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED &&
+        FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(
+                Context.FINGERPRINT_SERVICE);
+        return context.getApplicationContext().checkSelfPermission(
+                Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED &&
                 (fingerprintManager != null && fingerprintManager.isHardwareDetected());
     }
 
     // Check to see if device not only supports the Fingerprint scanner but also if is enrolled
     public static boolean hasFingerprintEnrolled(Context context) {
-        FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
-        return context.getApplicationContext().checkSelfPermission(Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED &&
-                (fingerprintManager != null && fingerprintManager.isHardwareDetected() && fingerprintManager.hasEnrolledFingerprints());
+        FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(
+                Context.FINGERPRINT_SERVICE);
+        return context.getApplicationContext().checkSelfPermission(
+                Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED &&
+                (fingerprintManager != null && fingerprintManager.isHardwareDetected() &&
+                        fingerprintManager.hasEnrolledFingerprints());
     }
 
     // Check to see if device has a camera
@@ -319,47 +273,13 @@ public class PixeldustUtils {
 
     // Check to see if device supports an alterative ambient display package
     public static boolean hasAltAmbientDisplay(Context context) {
-        return context.getResources().getBoolean(com.android.internal.R.bool.config_alt_ambient_display);
+        return context.getResources().getBoolean(
+                com.android.internal.R.bool.config_alt_ambient_display);
     }
 
     // Check to see if device supports A/B (seamless) system updates
     public static boolean isABdevice(Context context) {
         return SystemProperties.getBoolean("ro.build.ab_update", false);
-    }
-
-    public static void sendKeycode(int keycode, Handler h) {
-        long when = SystemClock.uptimeMillis();
-        final KeyEvent evDown = new KeyEvent(when, when, KeyEvent.ACTION_DOWN, keycode, 0,
-                0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
-                KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY,
-                InputDevice.SOURCE_KEYBOARD);
-        final KeyEvent evUp = KeyEvent.changeAction(evDown, KeyEvent.ACTION_UP);
-        h.post(new Runnable() {
-            @Override
-            public void run() {
-                InputManager.getInstance().injectInputEvent(evDown,
-                        InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
-            }
-        });
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputManager.getInstance().injectInputEvent(evUp,
-                        InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
-            }
-        }, 20);
-    }
-
-    public static void moveKbCursor(int action, boolean right) {
-        int code = right ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
-        long downTime = System.currentTimeMillis();
-        long when = downTime;
-        final KeyEvent ev = new KeyEvent(downTime, when, action, code, 0,
-                0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
-                (KeyEvent.FLAG_SOFT_KEYBOARD | KeyEvent.FLAG_KEEP_TOUCH_MODE),
-                InputDevice.SOURCE_KEYBOARD);
-        InputManager.getInstance().injectInputEvent(ev,
-                InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
     }
 
     public static void takeScreenrecord(int mode) {
@@ -417,48 +337,6 @@ public class PixeldustUtils {
         return targetKilled;
     }
 
-    // Volume panel
-    public static void toggleVolumePanel(Context context) {
-        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        am.adjustVolume(AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
-    }
-
-    // Clear notifications
-    public static void clearAllNotifications() {
-        IStatusBarService service = getStatusBarService();
-        if (service != null) {
-            try {
-                service.onClearAllNotifications(ActivityManager.getCurrentUser());
-            } catch (RemoteException e) {
-                // do nothing.
-            }
-        }
-    }
-
-    // Toggle notifications panel
-    public static void toggleNotifications() {
-        IStatusBarService service = getStatusBarService();
-        if (service != null) {
-            try {
-                service.expandNotificationsPanel();
-            } catch (RemoteException e) {
-                // do nothing.
-            }
-        }
-    }
-
-    // Toggle qs panel
-    public static void toggleQsPanel() {
-        IStatusBarService service = getStatusBarService();
-        if (service != null) {
-            try {
-                service.expandSettingsPanel(null);
-            } catch (RemoteException e) {
-                // do nothing.
-            }
-        }
-    }
-
     // Method to detect battery temperature
     public static String batteryTemperature(Context context, Boolean ForC) {
         Intent intent = context.registerReceiver(null, new IntentFilter(
@@ -487,5 +365,14 @@ public class PixeldustUtils {
         // Default to celsius if can't access MCC
         return !TextUtils.isEmpty(networkOperator) && Arrays.asList(mcc).contains(
                 networkOperator.substring(0, /*Filter only 3 digits*/ 3));
+    }
+
+    // Check if task is in lock task mode
+    public static boolean isInLockTaskMode() {
+        try {
+            return ActivityManagerNative.getDefault().isInLockTaskMode();
+        } catch (RemoteException e) {
+            return false;
+        }
     }
 }
