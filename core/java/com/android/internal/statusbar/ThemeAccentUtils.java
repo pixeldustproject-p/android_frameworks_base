@@ -169,6 +169,7 @@ public class ThemeAccentUtils {
         "com.android.systemui.qstile.oreo", // 11
         "com.android.systemui.qstile.oreocircletrim", // 12
         "com.android.systemui.qstile.oreosquircletrim", // 13
+        "com.android.systemui.qstile.cookie", // 14
     };
 
     // Unloads the stock dark theme
