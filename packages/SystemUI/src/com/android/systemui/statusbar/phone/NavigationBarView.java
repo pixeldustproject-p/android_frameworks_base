@@ -148,6 +148,9 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
     private boolean mFullGestureMode;
     private boolean mDt2s;
 
+    private final int ON = 1;
+    private final int OFF = 0;
+
     private GestureHelper mGestureHelper;
     private final DeadZone mDeadZone;
     private boolean mDeadZoneConsuming = false;
@@ -1470,15 +1473,18 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
             final boolean showingIme = ((mNavigationIconHints
                     & StatusBarManager.NAVIGATION_HINT_BACK_ALT) != 0);
             final int vis = showingIme ? View.VISIBLE : View.GONE;
-            if (isFullGestureMode()) {
-                getDpadView().findViewById(R.id.dpad_left).setVisibility(View.GONE);
-                getDpadView().findViewById(R.id.dpad_right).setVisibility(View.GONE);
-            } else {
-                getDpadView().findViewById(R.id.dpad_left).setVisibility(vis);
-                getDpadView().findViewById(R.id.dpad_right).setVisibility(vis);
-            }
 
-            if ( isQuickStepSwipeUpEnabled()) {
+            final int defaultValue = getResources()
+                    .getBoolean(com.android.internal.R.bool.config_swipe_up_gesture_default) ? ON : OFF;
+            final int swipeUpEnabled = Settings.Secure.getInt(getContext().getContentResolver(),
+                    Settings.Secure.SWIPE_UP_TO_SWITCH_APPS_ENABLED, defaultValue);
+
+            if (swipeUpEnabled != OFF) {
+                getDpadView().findViewById(R.id.dpad_left).setVisibility(
+                    !fullGestureModeEnabled() ? vis: View.GONE);
+                getDpadView().findViewById(R.id.dpad_right).setVisibility(
+                    !fullGestureModeEnabled() ? vis: View.GONE);
+            } else {
                 getDpadView().findViewById(R.id.dpad_left).setVisibility(vis);
                 getDpadView().findViewById(R.id.dpad_right).setVisibility(vis);
             }
@@ -1525,5 +1531,10 @@ public class NavigationBarView extends FrameLayout implements Navigator, PulseOb
             updateNavButtonIcons();
             setNavigationIconHints(mNavigationIconHints);
         }
+    }
+
+    private boolean fullGestureModeEnabled() {
+        return Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.FULL_GESTURE_NAVBAR, OFF) == ON;
     }
 }
