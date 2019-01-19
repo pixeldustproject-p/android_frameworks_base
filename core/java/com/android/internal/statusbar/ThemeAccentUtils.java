@@ -90,7 +90,7 @@ public class ThemeAccentUtils {
         "com.android.documentsui.theme.shishucosmos", // 7
         "com.google.android.gms.theme.shishucosmos", // 8
         "com.google.android.apps.wellbeing.theme.shishucosmos", // 9
-        "com.accents.candyred", // 10
+        "com.accents.obfusbleu", // 10
     };
 
     // Accents
