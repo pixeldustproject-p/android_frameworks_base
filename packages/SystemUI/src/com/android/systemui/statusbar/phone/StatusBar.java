@@ -702,6 +702,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     private Handler ambientClearingHandler;
     private Runnable ambientClearingRunnable;
 
+    private CollapsedStatusBarFragment sbFragment;
+
     @Override
     public void start() {
         mGroupManager = Dependency.get(NotificationGroupManager.class);
@@ -941,7 +943,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mNotificationIconAreaController);
         FragmentHostManager.get(mStatusBarWindow)
                 .addTagListener(CollapsedStatusBarFragment.TAG, (tag, fragment) -> {
-                    CollapsedStatusBarFragment statusBarFragment =
+                    CollapsedStatusBarFragment statusBarFragment = sbFragment =
                             (CollapsedStatusBarFragment) fragment;
                     statusBarFragment.initNotificationIconArea(mNotificationIconAreaController);
                     PhoneStatusBarView oldStatusBarView = mStatusBarView;
@@ -2674,6 +2676,10 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
     private void runPostCollapseRunnables() {
+        // Ensure that statusbar clock is updated to avoid glitches
+        if (sbFragment != null) {
+            sbFragment.updateSettings(false);
+        }
         ArrayList<Runnable> clonedList = new ArrayList<>(mPostCollapseRunnables);
         mPostCollapseRunnables.clear();
         int size = clonedList.size();
