@@ -90,9 +90,6 @@
   <java-symbol type="color" name="notification_text_default_color" />
   <java-symbol type="color" name="notification_ambient_default_color" />
 
-  <!-- Ambient Recognition -->
-  <java-symbol type="bool" name="config_supportAmbientRecognition" />
-
   <java-symbol type="string" name="config_deviceKeyHandlerLib" />
   <java-symbol type="string" name="config_deviceKeyHandlerClass" />
 
@@ -186,10 +183,6 @@
   <java-symbol type="integer" name="config_buttonBrightnessSettingDefault" />
   <java-symbol type="bool" name="config_deviceHasVariableButtonBrightness" />
 
-  <!-- Ambient Play -->
-  <java-symbol type="string" name="ambient_recognition_notification" />
-  <java-symbol type="string" name="ambient_recognition_information" />
-
   <!-- Weather icons -->
   <java-symbol type="drawable" name="weather_clear_night" />
   <java-symbol type="drawable" name="weather_cloudy" />
@@ -225,11 +218,5 @@
 
   <!-- Whether auto face unlock is enabled by default -->
   <java-symbol type="bool" name="config_face_unlock_enabled_by_default" />
-
-    <!-- Default start time for Ambient Play quiet period -->
-    <java-symbol type="integer" name="config_defaultAmbientPlayQuitPeriodStartTime" />
-
-    <!-- Default end time for Ambient Play quiet period -->
-    <java-symbol type="integer" name="config_defaultAmbientPlayQuitPeriodEndTime" />
 
 </resources>

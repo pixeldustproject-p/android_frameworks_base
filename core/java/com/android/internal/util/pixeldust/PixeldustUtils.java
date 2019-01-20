@@ -40,8 +40,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.Manifest;
 import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -323,11 +321,6 @@ public class PixeldustUtils {
         return SystemProperties.getBoolean("ro.build.ab_update", false);
     }
 
-    public static boolean isAmbientPlayAvailable(Context context) {
-        return context.getResources()
-                .getBoolean(com.android.internal.R.bool.config_supportAmbientRecognition);
-    }
-
     public static void sendKeycode(int keycode, Handler h) {
         long when = SystemClock.uptimeMillis();
         final KeyEvent evDown = new KeyEvent(when, when, KeyEvent.ACTION_DOWN, keycode, 0,
@@ -349,34 +342,6 @@ public class PixeldustUtils {
                         InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
             }
         }, 20);
-    }
-
-    public static int isConnectionAvailable(Context context) {
-        final Context mContext = context;
-        final ConnectivityManager connManager =
-                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo activeNetworkInfo = connManager.getActiveNetworkInfo();
-        final Network network = connManager.getActiveNetwork();
-        final NetworkCapabilities capabilities = connManager
-            .getNetworkCapabilities(network);
-        /**
-         * Return -1 if We don't have any network connectivity
-         * Return 0 if we are on WiFi  (desired)
-         * Return 1 if we are on MobileData (Little less desired)
-         * Return 2 if not sure which connection is user on but has network connectivity 
-         */
-
-        if (activeNetworkInfo == null)
-            return -1;
-        else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
-            return 0;
-        else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
-            return 1;
-        else if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) 
-            && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED))
-            return 2;
-        else
-            return -1;
     }
 
     public static void moveKbCursor(int action, boolean right) {

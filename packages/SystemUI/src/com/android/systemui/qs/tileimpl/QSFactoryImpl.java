@@ -26,7 +26,6 @@ import com.android.systemui.qs.external.CustomTile;
 import com.android.systemui.qs.tiles.AirplaneModeTile;
 import com.android.systemui.qs.tiles.AlwaysOnDisplayTile;
 import com.android.systemui.qs.tiles.AmbientDisplayTile;
-import com.android.systemui.qs.tiles.AmbientPlayTile;
 import com.android.systemui.qs.tiles.ANBITile;
 import com.android.systemui.qs.tiles.BatterySaverTile;
 import com.android.systemui.qs.tiles.PDSettingsTile;
@@ -154,8 +153,6 @@ public class QSFactoryImpl implements QSFactory {
                 return new CompassTile(mHost);
             case "gaming":
                 return new GamingModeTile(mHost);
-            case "nowplaying":
-                return new AmbientPlayTile(mHost);
             case "locale":
                 return new LocaleTile(mHost);
             case "anbi":
