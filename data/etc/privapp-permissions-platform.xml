@@ -447,4 +447,10 @@ applications that come with the platform
         <permission name="android.permission.CONTROL_VPN"/>
     </privapp-permissions>
 
+    <privapp-permissions package="com.custom.ambient.display">
+        <permission name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+        <permission name="android.permission.WAKE_LOCK" />
+        <permission name="android.permission.INTERACT_ACROSS_USERS" />
+    </privapp-permissions>
+
 </permissions>
