@@ -25,7 +25,7 @@ import android.provider.Settings.Secure;
 import android.service.quicksettings.Tile;
 
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
-
+import com.android.internal.util.pixeldust.PixeldustUtils;
 import com.android.systemui.R;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
 import com.android.systemui.qs.QSHost;
@@ -68,8 +68,13 @@ public class AlwaysOnDisplayTile extends QSTileImpl<BooleanState> {
 
     @Override
     public Intent getLongClickIntent() {
-        return new Intent().setComponent(new ComponentName(
-            "com.android.settings", "com.android.settings.Settings$AmbientDisplayActivity"));
+        if (PixeldustUtils.hasAltAmbientDisplay(mContext.getApplicationContext())) {
+            return null;
+        } else {
+            return new Intent().setComponent(new ComponentName(
+                    "com.android.settings",
+                    "com.android.settings.Settings$AmbientDisplayActivity"));
+        }
     }
 
     @Override

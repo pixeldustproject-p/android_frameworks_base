@@ -26,13 +26,13 @@ import android.provider.Settings.Secure;
 import android.service.quicksettings.Tile;
 import android.text.TextUtils;
 
+import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
+import com.android.internal.util.pixeldust.PixeldustUtils;
 import com.android.systemui.R;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
 import com.android.systemui.qs.QSHost;
 import com.android.systemui.qs.SecureSetting;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
-
-import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 
 /** Quick settings tile: Ambient Display **/
 public class AmbientDisplayTile extends QSTileImpl<BooleanState> {
@@ -74,8 +74,13 @@ public class AmbientDisplayTile extends QSTileImpl<BooleanState> {
 
     @Override
     public Intent getLongClickIntent() {
-        return new Intent().setComponent(new ComponentName(
-            "com.android.settings", "com.android.settings.Settings$AmbientDisplayActivity"));
+        if (PixeldustUtils.hasAltAmbientDisplay(mContext.getApplicationContext())) {
+            return null;
+        } else {
+            return new Intent().setComponent(new ComponentName(
+                    "com.android.settings",
+                    "com.android.settings.Settings$AmbientDisplayActivity"));
+        }
     }
 
     private void setEnabled(boolean enabled) {
