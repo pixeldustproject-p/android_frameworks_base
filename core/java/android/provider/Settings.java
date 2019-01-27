@@ -4672,7 +4672,6 @@ public final class Settings {
          */
         public static final String VOLUME_ROCKER_WAKE = "volume_rocker_wake";
 
-
         /**
          * @hide
          */
@@ -4982,6 +4981,13 @@ public final class Settings {
          * @hide
          */
         public static final String AMBIENT_BATTERY_PERCENT = "ambient_battery_percent";
+
+        /**
+         * Ambient screen settings
+         * "screen_brightness_array=0:1:2:3:4"
+         * @hide
+         */
+        public static final String ALWAYS_ON_DISPLAY_CONSTANTS_CUST = "always_on_display_constants_cust";
 
         /**
          * Enable blocking wakelock
