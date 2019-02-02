@@ -31,6 +31,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.internal.util.pixeldust.PixeldustUtils;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.StatusIconDisplayable;
@@ -263,7 +264,7 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
 
     private void updateSettings() {
         updateVisibility();
-        if (mIsEnabled) {
+        if (!PixeldustUtils.hasNotch(mContext) && mIsEnabled) {
             if (mAttached) {
                 totalRxBytes = TrafficStats.getTotalRxBytes();
                 lastUpdateTime = SystemClock.elapsedRealtime();
