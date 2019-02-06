@@ -10245,6 +10245,13 @@ public final class Settings {
         public static final String DOT_COLOR_SWITCH = "dot_color_switch";
 
         /**
+         * Select various actions for squeeze gesture
+         *
+         * @hide
+         */
+        public static final String SQUEEZE_SELECTION = "squeeze_selection";
+
+        /**
          * Show UI feedback when using back gesture.
          * @hide
          */
