@@ -204,14 +204,30 @@ public class PixeldustUtils {
         return false;
     }
 
+    // Screen off
     public static void switchScreenOff(Context ctx) {
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
-        if (pm!= null) {
+        if (pm!= null && pm.isScreenOn()) {
             pm.goToSleep(SystemClock.uptimeMillis());
         }
     }
 
-	public static boolean deviceHasCompass(Context ctx) {
+    // Screen on
+    public static void switchScreenOn(Context ctx) {
+        PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+        if (pm == null) return;
+        PowerManager.WakeLock wakeLock = pm.newWakeLock((
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP), "wakeup:device");
+        boolean isScreenOn = pm.isScreenOn();
+        /* Wake up the device only when screen is off.
+         * Otherwise don't bother to do anything. */
+        if (!wakeLock.isHeld() && !isScreenOn) {
+            wakeLock.acquire();
+        }
+    }
+
+    public static boolean deviceHasCompass(Context ctx) {
         SensorManager sm = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
         return sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null
                 && sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null;
