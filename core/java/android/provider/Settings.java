@@ -9820,6 +9820,13 @@ public final class Settings {
                 "status_bar_locked_on_secure_keyguard";
 
         /**
+         * Whether user has to unlock the secured lock screen before they can use a quick settings tile.
+         * @hide
+         */
+        public static final String QSTILE_REQUIRES_UNLOCKING =
+                "qstile_requires_unlocking";
+
+        /**
          * @hide
          */
         public static final String NAVIGATION_BAR_HEIGHT_LANDSCAPE = "navigation_bar_height_landscape";
