@@ -4220,35 +4220,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     /** {@inheritDoc} */
     @Override
     public long interceptKeyBeforeDispatching(WindowState win, KeyEvent event, int policyFlags) {
-        final int action = event.getAction();
-        final int flags = event.getFlags();
+        final boolean keyguardOn = keyguardOn();
         final int keyCode = event.getKeyCode();
-        final int metaState = event.getMetaState();
         final int repeatCount = event.getRepeatCount();
-        final int source = event.getSource();
-
-        final boolean down = action == KeyEvent.ACTION_DOWN;
-
+        final int metaState = event.getMetaState();
+        final int flags = event.getFlags();
+        final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         final boolean canceled = event.isCanceled();
-        final boolean fromSystem = (flags & KeyEvent.FLAG_FROM_SYSTEM) != 0;
         final boolean longPress = (flags & KeyEvent.FLAG_LONG_PRESS) != 0;
         final boolean virtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
-        final boolean virtualHardKey = (flags & KeyEvent.FLAG_VIRTUAL_HARD_KEY) != 0;
-        final boolean navBarKey = source == InputDevice.SOURCE_NAVIGATION_BAR;
-        final boolean isCustomSource = source == InputDevice.SOURCE_CUSTOM;
-
-        final boolean appSwitchKey = keyCode == KeyEvent.KEYCODE_APP_SWITCH;
-        final boolean homeKey = keyCode == KeyEvent.KEYCODE_HOME;
-        final boolean menuKey = keyCode == KeyEvent.KEYCODE_MENU;
-
-        final boolean keyguardOn = keyguardOn();
 
         if (DEBUG_INPUT) {
-            Log.d(TAG, "interceptKeyBeforeDispatching(): event = " + event.toString()
-                    +  ", keyguardOn = " + keyguardOn + ", canceled = " + canceled
-                    + ", virtualKey = "+ virtualKey + ", virtualHardKey = " + virtualHardKey
-                    + ", navBarKey = " + navBarKey + ", fromSystem = " + fromSystem
-                    + ", longPress = " + longPress);
+            Log.d(TAG, "interceptKeyTi keyCode=" + keyCode + " down=" + down + " repeatCount="
+                    + repeatCount + " keyguardOn=" + keyguardOn + " mHomePressed=" + mHomePressed
+                    + " canceled=" + canceled);
         }
 
         // we only handle events from hardware key devices that originate from
@@ -4348,113 +4333,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHandler.removeCallbacks(mBackLongPress);
         }
 
-        // Custom event handling for supported key codes.
-        if (!PixeldustUtils.isInLockTaskMode() && NavbarUtilities.canApplyCustomPolicy(keyCode) && !isCustomSource) {
-            if ((menuKey || appSwitchKey) && keyguardOn) {
-                // Don't handle the key.
-                return -1;
-            }
-
-            final Runnable doubleTapRunnable = NavbarUtilities.getDoubleTapTimeoutRunnable(keyCode);
-
-            // We have released the keyCode's key, decide what and if run our key's action.
-            if (!down) {
-                cancelPreloadRecentApps();
-
-                NavbarUtilities.setKeyPressed(keyCode, false);
-                if (NavbarUtilities.isKeyConsumed(keyCode)) {
-                    NavbarUtilities.setKeyConsumed(keyCode, false);
-                    return -1;
-                }
-
-                if (canceled) {
-                    Log.i(TAG, "Ignoring; " + "keyCode: " + keyCode + ", event canceled.");
-                    return -1;
-                }
-
-                if (homeKey) {
-                    // If an incoming call is ringing, HOME is totally disabled.
-                    // (The user is already on the InCallUI at this point,
-                    // and his ONLY options are to answer or reject the call.)
-                    TelecomManager telecomManager = getTelecommService();
-                    if (telecomManager != null && telecomManager.isRinging()) {
-                        Log.i(TAG, "Ignoring; " + "keyCode: " + keyCode + "there's a ringing incoming call.");
-                        return -1;
-                    }
-                }
-
-                // Delay handling home if a double-tap is possible.
-                final int doubleTapBehavior = NavbarUtilities.getKeyDoubleTapBehavior(keyCode);
-                if (doubleTapBehavior != NavbarUtilities.KEY_ACTION_NOTHING) {
-                    mHandler.removeCallbacks(doubleTapRunnable); // just in case
-                    NavbarUtilities.setKeyDoubleTapPending(keyCode, true);
-                    mHandler.postDelayed(doubleTapRunnable,
-                            ViewConfiguration.getDoubleTapTimeout() / 2);
-                    return -1;
-                }
-
-                handleShortPressOnKeyCode(keyCode);
-                return -1;
-            }
-
-            if (homeKey) {
-                // If a system window has focus, then it doesn't make sense
-                // right now to interact with applications.
-                WindowManager.LayoutParams attrs = win != null ? win.getAttrs() : null;
-                if (attrs != null) {
-                    final int type = attrs.type;
-                    if (type == WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG
-                            || (attrs.privateFlags & PRIVATE_FLAG_KEYGUARD) != 0) {
-                        // the "app" is keyguard, so give it the key
-                        return 0;
-                    }
-                    final int typeCount = WINDOW_TYPES_WHERE_HOME_DOESNT_WORK.length;
-                    for (int i = 0; i < typeCount; i++) {
-                        if (type == WINDOW_TYPES_WHERE_HOME_DOESNT_WORK[i]) {
-                            // don't do anything, but also don't pass it to the app
-                            return -1;
-                        }
-                    }
-                }
-            }
-
-            // Remember that keyCode's key is pressed and handle special actions.
-            if (repeatCount == 0) {
-                NavbarUtilities.setKeyPressed(keyCode, true);
-                NavbarUtilities.setKeyConsumed(keyCode, false);
-                final boolean doubleTapPending = NavbarUtilities.isKeyDoubleTapPending(keyCode);
-                final int longPressBehavior = NavbarUtilities.getKeyLongPressBehavior(keyCode);
-                final int doubleTapBehavior = NavbarUtilities.getKeyDoubleTapBehavior(keyCode);
-                if (doubleTapPending) {
-                    NavbarUtilities.setKeyDoubleTapPending(keyCode, false);
-                    mHandler.removeCallbacks(doubleTapRunnable);
-                    NavbarUtilities.setKeyConsumed(keyCode, true);
-                    if (!keyguardOn) {
-                        handleDoubleTapOnKeyCode(keyCode);
-                    }
-                } else {
-                    if (keyCode == KeyEvent.KEYCODE_APP_SWITCH
-                            || longPressBehavior == NavbarUtilities.KEY_ACTION_APP_SWITCH
-                            || doubleTapBehavior == NavbarUtilities.KEY_ACTION_APP_SWITCH
-                            || longPressBehavior == NavbarUtilities.KEY_ACTION_SPLIT_SCREEN
-                            || doubleTapBehavior == NavbarUtilities.KEY_ACTION_SPLIT_SCREEN
-                            || longPressBehavior == NavbarUtilities.KEY_ACTION_LAST_APP
-                            || doubleTapBehavior == NavbarUtilities.KEY_ACTION_LAST_APP) {
-                        preloadRecentApps();
-                    }
-                }
-            } else if (longPress) {
-                if (DEBUG_INPUT) {
-                    Log.i(TAG, "longPress happened! " + ", keyguardOn=" + keyguardOn);
-                }
-                NavbarUtilities.setKeyConsumed(keyCode, true);
-                if (!keyguardOn) {
-                    handleLongPressOnKeyCode(keyCode);
-                }
-            }
-            return -1;
-        }
-
         // First we always handle the home key here, so applications
         // can never break it, although if keyguard is on, we do let
         // it handle it, because that gives us the correct 5 second
@@ -4519,7 +4397,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 } else if (mDoubleTapOnHomeBehavior == DOUBLE_TAP_HOME_RECENT_SYSTEM_UI) {
                     preloadRecentApps();
                 }
-            } else if (longPress) {
+            } else if ((event.getFlags() & KeyEvent.FLAG_LONG_PRESS) != 0) {
                 if (!keyguardOn) {
                     handleLongPressOnHome(event.getDeviceId());
                 }
@@ -6967,27 +6845,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return 0;
         }
 
-        final int action = event.getAction();
-        final int flags = event.getFlags();
-        final int keyCode = event.getKeyCode();
-        final int source = event.getSource();
-
-        final boolean down = action == KeyEvent.ACTION_DOWN;
-
-        final boolean canceled = event.isCanceled();
-        final boolean fromSystem = (flags & KeyEvent.FLAG_FROM_SYSTEM) != 0;
-        final boolean virtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
-        final boolean virtualHardKey = (flags & KeyEvent.FLAG_VIRTUAL_HARD_KEY) != 0;
-        final boolean navBarKey = source == InputDevice.SOURCE_NAVIGATION_BAR;
-        final boolean isCustomSource = source == InputDevice.SOURCE_CUSTOM;
-
         final boolean interactive = (policyFlags & FLAG_INTERACTIVE) != 0;
+        final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+        final boolean canceled = event.isCanceled();
+        final int keyCode = event.getKeyCode();
+
         final boolean isInjected = (policyFlags & WindowManagerPolicy.FLAG_INJECTED) != 0;
 
+        final int source = event.getSource();
+        final boolean navBarKey = source == InputDevice.SOURCE_NAVIGATION_BAR;
         final boolean appSwitchKey = keyCode == KeyEvent.KEYCODE_APP_SWITCH;
         final boolean homeKey = keyCode == KeyEvent.KEYCODE_HOME;
         final boolean menuKey = keyCode == KeyEvent.KEYCODE_MENU;
         final boolean backKey = keyCode == KeyEvent.KEYCODE_BACK;
+        final boolean virtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
 
         // If screen is off then we treat the case where the keyguard is open but hidden
         // the same as if it were open and in front.
@@ -6998,17 +6869,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                                                 isKeyguardShowingAndNotOccluded() :
                                                 mKeyguardDelegate.isShowing()));
 
-        // Request haptic feedback for hw keys finger down events.
-        boolean hapticFeedbackRequested = false;
-
         if (DEBUG_INPUT) {
-            Log.d(TAG, "interceptKeyBeforeQueueing(): event =" + event.toString()
-                    + "interceptKeyTq keycode=" + keyCode
-                    + ", interactive =" + interactive + ", keyguardActive =" + keyguardActive
-                    + ", policyFlags =" + Integer.toHexString(policyFlags)
-                    + ", virtualKey = " + virtualKey + ", virtualHardKey = " + virtualHardKey
-                    + ", navBarKey = " + navBarKey + ", fromSystem = " + fromSystem
-                    + ", canApplyCustomPolicy = " + NavbarUtilities.canApplyCustomPolicy(keyCode));
+            Log.d(TAG, "interceptKeyTq keycode=" + keyCode
+                    + " interactive=" + interactive + " keyguardActive=" + keyguardActive
+                    + " policyFlags=" + Integer.toHexString(policyFlags));
 		}
 
         // Pre-basic policy based on interactive and pocket lock state.
@@ -7036,41 +6900,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         // Disable hw keys in Ambient
         if (isDozeMode() && (appSwitchKey || homeKey || menuKey || backKey)) {
             return 0;
-        }
-
-        // Apply custom policy for supported key codes.
-        if (NavbarUtilities.canApplyCustomPolicy(keyCode) && !isCustomSource) {
-            if (mNavbarVisible && !navBarKey /* TODO> && !isADBVirtualKeyOrAnyOtherKeyThatWeNeedToHandleAKAWhenMonkeyTestOrWHATEVER! */) {
-                if (DEBUG_INPUT) {
-                    Log.d(TAG, "interceptKeyBeforeQueueing(): key policy: mNavbarVisible, discard hw event.");
-                }
-                // Don't allow key events from hw keys when navbar is enabled.
-                return 0;
-            } else if (!interactive && !PixeldustUtils.isInLockTaskMode()) {
-                if (DEBUG_INPUT) {
-                    Log.d(TAG, "interceptKeyBeforeQueueing(): key policy: screen not interactive, discard hw event.");
-                }
-                // Ensure nav keys are handled on full interactive screen only.
-                return 0;
-            } else if (interactive && !PixeldustUtils.isInLockTaskMode()) {
-                if (!down) {
-                    // Make sure we consume hw key events properly. Discard them
-                    // here if the event is already been consumed. This case can
-                    // happen when we send virtual key events and the virtual
-                    // ACTION_UP is sent before the hw ACTION_UP resulting in
-                    // handling twice an action up event.
-                    final boolean consumed = NavbarUtilities.isKeyConsumed(keyCode);
-                    if (consumed) {
-                        if (DEBUG_INPUT) {
-                            Log.d(TAG, "interceptKeyBeforeQueueing(): key policy: event already consumed, discard hw event.");
-                        }
-                        NavbarUtilities.setKeyConsumed(keyCode, !consumed);
-                        return 0;
-                    }
-                } else {
-                    hapticFeedbackRequested = true;
-                }
-            }
         }
 
         // Basic policy based on interactive state.
@@ -7126,19 +6955,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return result;
         }
 
-        // If not requested by our custom policy, then check if the key is virtual.
-        hapticFeedbackRequested |= (policyFlags & WindowManagerPolicy.FLAG_VIRTUAL) != 0;
-
         // Enable haptics if down and virtual key without multiple repetitions. If this is a hard
         // virtual key such as a navigation bar button, only vibrate if flag is enabled.
         final boolean isNavBarVirtKey = ((event.getFlags() & KeyEvent.FLAG_VIRTUAL_HARD_KEY) != 0);
         boolean useHapticFeedback = down
                 && (policyFlags & WindowManagerPolicy.FLAG_VIRTUAL) != 0
                 && (!isNavBarVirtKey || mNavBarVirtualKeyHapticFeedbackEnabled)
-                && hapticFeedbackRequested
-                && event.getRepeatCount() == 0
-                // Trigger haptic feedback only for "real" events.
-                && source != InputDevice.SOURCE_CUSTOM;
+                && event.getRepeatCount() == 0;
 
         if (!virtualKey) {
             if (isHwKeysDisabled() || keyguardOn()) {
