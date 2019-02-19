@@ -87,13 +87,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.MediaMetadata;
-import android.media.session.MediaController;
 import android.metrics.LogMaker;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Process;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
@@ -152,13 +150,6 @@ import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.statusbar.ThemeAccentUtils;
-import com.android.internal.util.pixeldust.PixeldustUtils;
-import com.android.internal.util.hwkeys.ActionConstants;
-import com.android.internal.util.hwkeys.ActionUtils;
-import com.android.internal.util.hwkeys.PackageMonitor;
-import com.android.internal.util.hwkeys.PackageMonitor.PackageChangedListener;
-import com.android.internal.util.hwkeys.PackageMonitor.PackageState;
-import com.android.internal.utils.SmartPackageMonitor;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.MessagingGroup;
 import com.android.internal.widget.MessagingMessage;
@@ -192,7 +183,6 @@ import com.android.systemui.fragments.FragmentHostManager;
 import com.android.systemui.keyguard.KeyguardViewMediator;
 import com.android.systemui.keyguard.ScreenLifecycle;
 import com.android.systemui.keyguard.WakefulnessLifecycle;
-import com.android.systemui.navigation.Navigator;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.plugins.qs.QS;
 import com.android.systemui.plugins.statusbar.NotificationSwipeActionHelper.SnoozeOption;
@@ -285,7 +275,7 @@ import java.util.Map;
 public class StatusBar extends SystemUI implements DemoMode,
         DragDownHelper.DragDownCallback, ActivityStarter, OnUnlockMethodChangedListener,
         OnHeadsUpChangedListener, CommandQueue.Callbacks, ZenModeController.Callback,
-        ColorExtractor.OnColorsChangedListener, ConfigurationListener, NotificationPresenter, PackageChangedListener {
+        ColorExtractor.OnColorsChangedListener, ConfigurationListener, NotificationPresenter {
     public static final boolean MULTIUSER_DEBUG = false;
 
     public static final boolean ENABLE_CHILD_NOTIFICATIONS
@@ -501,8 +491,6 @@ public class StatusBar extends SystemUI implements DemoMode,
     private int mLastDispatchedSystemUiVisibility = ~View.SYSTEM_UI_FLAG_VISIBLE;
 
     private final DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-
-    private PackageMonitor mPackageMonitor;
 
     // XXX: gesture research
     private final GestureRecorder mGestureRec = DEBUG_GESTURES
@@ -720,12 +708,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 
         mDisplay = mWindowManager.getDefaultDisplay();
-
         updateDisplaySize();
-
-        mPackageMonitor = new PackageMonitor();
-        mPackageMonitor.register(mContext, mHandler);
-        mPackageMonitor.addListener(this);
 
         Resources res = mContext.getResources();
         mVibrateOnOpening = mContext.getResources().getBoolean(
@@ -748,9 +731,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
         mDeviceProvisionedController = Dependency.get(DeviceProvisionedController.class);
-
-        mContext.getContentResolver().registerContentObserver(Settings.Secure.getUriFor(
-                Settings.Secure.NAVIGATION_BAR_VISIBLE), false, mNavbarObserver, UserHandle.USER_ALL);
 
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
@@ -874,7 +854,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         Dependency.get(ActivityStarterDelegate.class).setActivityStarterImpl(this);
 
         Dependency.get(ConfigurationController.class).addCallback(this);
-        mFlashlightController = Dependency.get(FlashlightController.class);
     }
 
     // ================================================================================
@@ -988,15 +967,15 @@ public class StatusBar extends SystemUI implements DemoMode,
             mNotificationPanelDebugText.setVisibility(View.VISIBLE);
         }
 
-        boolean showNav = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.NAVIGATION_BAR_VISIBLE,
-                ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0) != 0;
-        if (DEBUG)
-            Log.v(TAG, "hasNavigationBar=" + showNav);
-        if (showNav) {
-            createNavigationBar();
+        try {
+            boolean showNav = mWindowManagerService.hasNavigationBar();
+            if (DEBUG) Log.v(TAG, "hasNavigationBar=" + showNav);
+            if (showNav) {
+                createNavigationBar();
+            }
+        } catch (RemoteException ex) {
+            // no window manager? good luck with that
         }
-
         mScreenPinningNotify = new ScreenPinningNotify(mContext);
         mStackScroller.setLongPressListener(mEntryManager.getNotificationLongClicker());
         mStackScroller.setStatusBar(this);
@@ -1196,23 +1175,8 @@ public class StatusBar extends SystemUI implements DemoMode,
             if (mLightBarController != null) {
                 mNavigationBar.setLightBarController(mLightBarController);
             }
-            if (!mNavigationBar.isUsingStockNav()) {
-                ((NavigationBarFrame)mNavigationBarView).disableDeadZone();
-            }
             mNavigationBar.setCurrentSysuiVisibility(mSystemUiVisibility);
         });
-    }
-
-    protected void removeNavigationBar() {
-        if (mNavigationBar != null && mNavigationBarView != null) {
-            FragmentHostManager fragmentHost = FragmentHostManager.get(mNavigationBarView);
-            if (mNavigationBarView.isAttachedToWindow()) {
-                mWindowManager.removeViewImmediate(mNavigationBarView);
-                mNavigationBarView = null;
-            }
-            fragmentHost.getFragmentManager().beginTransaction().remove(mNavigationBar).commit();
-            mNavigationBar = null;
-        }
     }
 
     public NotificationMediaManager getMediaManager() {
@@ -2268,9 +2232,6 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         if (!isExpanded) {
             mRemoteInputManager.removeRemoteInputEntriesKeptUntilCollapsed();
-        }
-        if (mNavigationBar != null) {
-            mNavigationBar.setPanelExpanded(isExpanded);
         }
     }
 
@@ -3728,34 +3689,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         Dependency.get(ConfigurationController.class).removeCallback(this);
         mZenController.removeCallback(this);
         mAppOpsListener.destroy();
-
-        mPackageMonitor.removeListener(this);
-        mPackageMonitor.unregister();
-    }
-
-    @Override
-    public void onPackageChanged(String pkg, PackageState state) {
-        if (state == PackageState.PACKAGE_REMOVED
-                || state == PackageState.PACKAGE_CHANGED) {
-            final Context ctx = mContext;
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!ActionUtils.hasNavbarByDefault(ctx)) {
-                        ActionUtils.resolveAndUpdateButtonActions(ctx,
-                                ActionConstants
-                                        .getDefaults(ActionConstants.HWKEYS));
-                    }
-                    ActionUtils
-                            .resolveAndUpdateButtonActions(ctx, ActionConstants
-                                    .getDefaults(ActionConstants.SMARTBAR));
-                    ActionUtils.resolveAndUpdateButtonActions(ctx,
-                            ActionConstants.getDefaults(ActionConstants.FLING));
-		}
-            });
-            thread.setPriority(Process.THREAD_PRIORITY_BACKGROUND);
-            thread.start();
-        }
     }
 
     private boolean mDemoModeAllowed;
@@ -4574,9 +4507,9 @@ public class StatusBar extends SystemUI implements DemoMode,
         return getMaxNotificationsWhileLocked(false /* recompute */);
     }
 
-    // TODO: Figure out way to remove this.
-    public Navigator getNavigationBarView() {
-        return mNavigationBar != null ? mNavigationBar.getNavigator() : null;
+    // TODO: Figure out way to remove these.
+    public NavigationBarView getNavigationBarView() {
+        return (mNavigationBar != null ? (NavigationBarView) mNavigationBar.getView() : null);
     }
 
     public View getNavigationBarWindow() {
@@ -5424,25 +5357,6 @@ public class StatusBar extends SystemUI implements DemoMode,
     public boolean shouldIgnoreTouch() {
         return isDozing() && mDozeServiceHost.mIgnoreTouchWhilePulsing;
     }
-
-    protected final ContentObserver mNavbarObserver = new ContentObserver(mHandler) {
-        @Override
-        public void onChange(boolean selfChange) {
-            boolean showing = Settings.Secure.getInt(mContext.getContentResolver(),
-                    Settings.Secure.NAVIGATION_BAR_VISIBLE,
-                    ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0) != 0;
-            if (!showing && mNavigationBar != null && mNavigationBarView != null) {
-                removeNavigationBar();
-            } else if (showing && mNavigationBar == null && mNavigationBarView == null) {
-                createNavigationBar();
-            }
-            if (!ActionUtils.hasNavbarByDefault(mContext)) {
-                Intent intent = new Intent("com.cyanogenmod.action.UserChanged");
-                intent.setPackage("com.android.settings");
-                mContext.sendBroadcastAsUser(intent, new UserHandle(UserHandle.USER_CURRENT));
-            }
-        }
-    };
 
     public boolean isDoubleTapOnMusicTicker(float eventX, float eventY) {
         if (eventX <= 0 || eventY <= 0 || mAmbientIndicationContainer == null

@@ -156,11 +156,6 @@
   <!-- IMESwitcher -->
   <java-symbol type="bool" name="config_show_cmIMESwitcher"/>
 
-  <!-- HW keys binding -->
-  <java-symbol type="anim" name="custom_app_in" />
-  <java-symbol type="anim" name="custom_app_out" />
-  <java-symbol type="integer" name="config_deviceHardwareKeys" />
-
   <!-- From SignalStrength -->
   <java-symbol type="integer" name="config_LTE_antenna_bar_quantity_metric" />
   <java-symbol type="integer" name="config_LTE_RSRP_threshold_type" />
@@ -202,10 +197,6 @@
   <java-symbol type="drawable" name="weather_sunny" />
   <java-symbol type="drawable" name="weather_thunderstorms" />
   <java-symbol type="drawable" name="weather_windy" />
-
-  <!-- Smartnav anims -->
-  <java-symbol type="anim" name="inv_app_in" />
-  <java-symbol type="anim" name="inv_app_out" />
 
   <java-symbol type="bool" name="config_oldQtiTelephony" />
 

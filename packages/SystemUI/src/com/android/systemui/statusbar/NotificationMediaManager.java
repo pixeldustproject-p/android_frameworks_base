@@ -30,7 +30,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import com.android.systemui.Dumpable;
-import com.android.systemui.statusbar.phone.StatusBar;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -57,17 +56,10 @@ public class NotificationMediaManager implements Dumpable {
     private MediaController mMediaController;
     private String mMediaNotificationKey;
     private MediaMetadata mMediaMetadata;
-    private MediaUpdateListener mListener;
 
     private String mNowPlayingNotificationKey;
 
     private Set<String> mBlacklist = new HashSet<String>();
-
-    // callback into NavigationFragment for Pulse
-    public interface MediaUpdateListener {
-        public void onMediaUpdated(boolean playing);
-        public void setPulseColors(boolean isColorizedMEdia, int[] colors);
-    }
 
     private final MediaController.Callback mMediaListener = new MediaController.Callback() {
         @Override
@@ -279,14 +271,6 @@ public class NotificationMediaManager implements Dumpable {
             pw.print(" title=" + mMediaMetadata.getText(MediaMetadata.METADATA_KEY_TITLE));
         }
         pw.println();
-    }
-
-    public void addCallback(MediaUpdateListener listener) {
-        mListener = listener;
-    }
-
-    public boolean isPlaybackActive() {
-        return isPlaybackActive(getMediaControllerPlaybackState(mMediaController));
     }
 
     private boolean isPlaybackActive(int state) {

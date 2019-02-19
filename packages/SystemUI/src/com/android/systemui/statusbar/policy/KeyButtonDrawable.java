@@ -25,14 +25,13 @@ import android.graphics.drawable.LayerDrawable;
 import android.view.Gravity;
 
 import com.android.systemui.R;
-import com.android.systemui.navigation.DarkIntensity;
 import com.android.systemui.statusbar.phone.ShadowKeyDrawable;
 
 /**
  * Drawable for {@link KeyButtonView}s which contains an asset for both normal mode and light
  * navigation bar mode.
  */
-public class KeyButtonDrawable extends LayerDrawable implements DarkIntensity {
+public class KeyButtonDrawable extends LayerDrawable {
 
     private final boolean mHasDarkDrawable;
 
