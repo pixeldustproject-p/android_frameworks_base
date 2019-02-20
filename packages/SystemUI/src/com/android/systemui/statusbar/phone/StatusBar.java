@@ -571,6 +571,7 @@ public class StatusBar extends SystemUI implements DemoMode,
     protected NotificationLockscreenUserManager mLockscreenUserManager;
     protected NotificationRemoteInputManager mRemoteInputManager;
     private boolean mWallpaperSupportsAmbientMode;
+    private boolean mNavbarVisible;
 
     private BroadcastReceiver mWallpaperChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -991,12 +992,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             mNotificationPanelDebugText.setVisibility(View.VISIBLE);
         }
 
-        boolean showNav = Settings.Secure.getInt(mContext.getContentResolver(),
+        mNavbarVisible = Settings.Secure.getInt(mContext.getContentResolver(),
                 Settings.Secure.NAVIGATION_BAR_VISIBLE,
                 ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0) != 0;
         if (DEBUG)
-            Log.v(TAG, "hasNavigationBar=" + showNav);
-        if (showNav) {
+            Log.v(TAG, "hasNavigationBar=" + mNavbarVisible);
+        if (mNavbarVisible) {
             createNavigationBar();
         }
 
@@ -1203,6 +1204,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 ((NavigationBarFrame)mNavigationBarView).disableDeadZone();
             }
             mNavigationBar.setCurrentSysuiVisibility(mSystemUiVisibility);
+            mNavigationBar.updateStates();
         });
     }
 
@@ -1214,12 +1216,17 @@ public class StatusBar extends SystemUI implements DemoMode,
         if (mNavigationBar != null && mNavigationBarView != null) {
             FragmentHostManager fragmentHost = FragmentHostManager.get(mNavigationBarView);
             if (mNavigationBarView.isAttachedToWindow()) {
+                mNavigationBar.updateStates();
                 mWindowManager.removeViewImmediate(mNavigationBarView);
                 mNavigationBarView = null;
             }
             fragmentHost.getFragmentManager().beginTransaction().remove(mNavigationBar).commit();
             mNavigationBar = null;
         }
+    }
+
+    public boolean isNavBarVisible() {
+        return mNavbarVisible;
     }
 
     /**

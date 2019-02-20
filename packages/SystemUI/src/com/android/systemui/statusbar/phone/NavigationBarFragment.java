@@ -204,9 +204,7 @@ Navigator.OnVerticalChangedListener, KeyguardMonitor.Callback, NotificationMedia
     private final OverviewProxyListener mOverviewProxyListener = new OverviewProxyListener() {
         @Override
         public void onConnectionChanged(boolean isConnected) {
-            setFullGestureMode(); // updateStates will update back icon visibility
-            mNavigationBarView.updateStates();
-            updateScreenPinningGestures();
+            updateStates();
         }
 
         @Override
@@ -217,9 +215,7 @@ Navigator.OnVerticalChangedListener, KeyguardMonitor.Callback, NotificationMedia
 
         @Override
         public void onInteractionFlagsChanged(@InteractionType int flags) {
-            setFullGestureMode();
-            mNavigationBarView.updateStates();
-            updateScreenPinningGestures();
+            updateStates();
         }
 
         @Override
@@ -235,6 +231,12 @@ Navigator.OnVerticalChangedListener, KeyguardMonitor.Callback, NotificationMedia
             }
         }
     };
+
+    public void updateStates() {
+        setFullGestureMode();
+        mNavigationBarView.updateStates();
+        updateScreenPinningGestures();
+    }
 
     // ----- Fragment Lifecycle Callbacks -----
 

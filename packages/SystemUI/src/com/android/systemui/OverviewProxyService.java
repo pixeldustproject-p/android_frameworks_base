@@ -83,6 +83,8 @@ public class OverviewProxyService implements CallbackController<OverviewProxyLis
     private @InteractionType int mInteractionFlags;
     private boolean mIsEnabled;
 
+    private final StatusBar statusBar;
+
     private ISystemUiProxy mSysUiProxy = new ISystemUiProxy.Stub() {
 
         public GraphicBufferCompat screenshot(Rect sourceCrop, int width, int height, int minLayer,
@@ -100,8 +102,6 @@ public class OverviewProxyService implements CallbackController<OverviewProxyLis
             long token = Binder.clearCallingIdentity();
             try {
                 mHandler.post(() -> {
-                    StatusBar statusBar = ((SystemUIApplication) mContext).getComponent(
-                            StatusBar.class);
                     if (statusBar != null) {
                         statusBar.showScreenPinningRequest(taskId, false /* allowCancel */);
                     }
@@ -277,6 +277,8 @@ public class OverviewProxyService implements CallbackController<OverviewProxyLis
             filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
             mContext.registerReceiver(mLauncherStateChangedReceiver, filter);
         }
+
+        statusBar = ((SystemUIApplication) mContext).getComponent(StatusBar.class);
     }
 
     private boolean isPieRecentsEnabled() {
@@ -339,7 +341,8 @@ public class OverviewProxyService implements CallbackController<OverviewProxyLis
     }
 
     public boolean shouldShowSwipeUpUI() {
-        return isEnabled() && ((mInteractionFlags & FLAG_DISABLE_SWIPE_UP) == 0);
+        boolean mNavBarVisible = statusBar == null ? true : statusBar.isNavBarVisible();
+        return mNavBarVisible && isEnabled() && ((mInteractionFlags & FLAG_DISABLE_SWIPE_UP) == 0);
     }
 
     public boolean isEnabled() {
