@@ -45,7 +45,6 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
 
     public static final String SLOT = "networktraffic";
 
-    private static final int INTERVAL = 1500; //ms
     private static final int KB = 1024;
     private static final int MB = KB * KB;
     private static final int GB = MB * KB;
@@ -65,6 +64,7 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
     private int txtSize;
     private int txtImgPadding;
     private int mAutoHideThreshold;
+    private int mRefreshInterval = 2;
     private int mTintColor;
     private int mVisibleState = -1;
     private boolean mTrafficVisible = false;
@@ -72,12 +72,14 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
 
     private boolean mScreenOn = true;
 
+    private static final String blank = "";
+
     private Handler mTrafficHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             long timeDelta = SystemClock.elapsedRealtime() - lastUpdateTime;
 
-            if (timeDelta < INTERVAL * .95) {
+            if (timeDelta < mRefreshInterval * 1000 * 0.95f) {
                 if (msg.what != 1) {
                     // we just updated the view, nothing further to do
                     return;
@@ -96,7 +98,7 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
             long txData = newTotalTxBytes - totalTxBytes;
 
             if (shouldHide(rxData, txData, timeDelta)) {
-                setText("");
+                setText(blank);
                 mTrafficVisible = false;
             } else {
                 // Get information for uplink ready so the line return can be added
@@ -120,7 +122,7 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
             totalRxBytes = newTotalRxBytes;
             totalTxBytes = newTotalTxBytes;
             clearHandlerCallbacks();
-            mTrafficHandler.postDelayed(mRunnable, INTERVAL);
+            mTrafficHandler.postDelayed(mRunnable, mRefreshInterval * 1000);
         }
 
         private String formatOutput(long timeDelta, long data, String symbol) {
@@ -163,6 +165,9 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
                     this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System
                     .getUriFor(Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD), false,
+                    this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.NETWORK_TRAFFIC_REFRESH_INTERVAL), false,
                     this, UserHandle.USER_ALL);
         }
 
@@ -279,6 +284,8 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
         mAutoHideThreshold = Settings.System.getIntForUser(resolver,
                 Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD, 1,
                 UserHandle.USER_CURRENT);
+        mRefreshInterval = Settings.System.getIntForUser(resolver,
+                Settings.System.NETWORK_TRAFFIC_REFRESH_INTERVAL, 2, UserHandle.USER_CURRENT);
     }
 
     private void clearHandlerCallbacks() {
@@ -316,7 +323,7 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
     public void onDarkChanged(Rect area, float darkIntensity, int tint) {
         mTintColor = DarkIconDispatcher.getTint(area, this, tint);
         setTextColor(mTintColor);
-        updateTrafficDrawable();
+        if (mAttached) updateTrafficDrawable();
     }
 
     @Override
@@ -355,9 +362,10 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
     }
 
     private void updateVisibility() {
-        if (mIsEnabled && mTrafficVisible && mSystemIconVisible) {
+        if (mIsEnabled && mTrafficVisible && mSystemIconVisible && !blank.contentEquals(getText())) {
             setVisibility(View.VISIBLE);
         } else {
+            setText(blank);
             setVisibility(View.GONE);
         }
     }
@@ -366,7 +374,7 @@ public class NetworkTraffic extends TextView implements StatusIconDisplayable {
     public void setStaticDrawableColor(int color) {
         mTintColor = color;
         setTextColor(mTintColor);
-        updateTrafficDrawable();
+        if (mAttached) updateTrafficDrawable();
     }
 
     @Override
