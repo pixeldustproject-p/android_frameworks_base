@@ -9716,6 +9716,20 @@ public final class Settings {
         public static final String LONG_SQUEEZE_CUSTOM_APP_FR_NAME = "long_squeeze_custom_app_fr_name";
 
         /**
+         * Launch custom activity when using the short squeeze feature (active edge)
+         *
+         * @hide
+         */
+        public static final String SHORT_SQUEEZE_CUSTOM_ACTIVITY = "short_squeeze_custom_activity";
+
+        /**
+         * Launch custom activity when using the long squeeze feature (active edge)
+         *
+         * @hide
+         */
+        public static final String LONG_SQUEEZE_CUSTOM_ACTIVITY = "long_squeeze_custom_activity";
+
+        /**
          * Boolean value whether to link ringtone and notification volume
          * @hide
          */
