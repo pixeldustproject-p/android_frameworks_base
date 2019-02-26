@@ -49,6 +49,7 @@ import com.android.systemui.qs.tiles.LteTile;
 import com.android.systemui.qs.tiles.NavBarTile;
 import com.android.systemui.qs.tiles.NfcTile;
 import com.android.systemui.qs.tiles.NightDisplayTile;
+import com.android.systemui.qs.tiles.OneHandTile;
 import com.android.systemui.qs.tiles.RebootTile;
 import com.android.systemui.qs.tiles.PieTile;
 import com.android.systemui.qs.tiles.RotationLockTile;
@@ -161,6 +162,8 @@ public class QSFactoryImpl implements QSFactory {
                 return new PieTile(mHost);
             case "screenrecord":
                 return new ScreenrecordTile(mHost);
+            case "onehand":
+                return new OneHandTile(mHost);
         }
 
         // Intent tiles.

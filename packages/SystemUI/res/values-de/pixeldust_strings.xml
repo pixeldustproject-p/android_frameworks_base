@@ -306,4 +306,7 @@
     <string name="global_action_restart_hot">Softneustart</string>
     <string name="global_action_screenrecord">Bildschirmaufnahme</string>
 
+    <!-- OneHand mode QS tile -->
+    <string name="qs_onehand_label">Einhandmodus</string>
+
 </resources>
