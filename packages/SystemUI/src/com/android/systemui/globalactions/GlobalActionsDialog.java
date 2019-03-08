@@ -36,16 +36,12 @@ import android.content.pm.UserInfo;
 import android.database.ContentObserver;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraAccessException;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
@@ -134,8 +130,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     private static final String GLOBAL_ACTION_KEY_LOGOUT = "logout";
     private static final String GLOBAL_ACTION_KEY_EMERGENCY = "emergency";
     private static final String GLOBAL_ACTION_KEY_SCREENSHOT = "screenshot";
-    private static final String GLOBAL_ACTION_KEY_RESTART_RECOVERY = "recovery";
-    private static final String GLOBAL_ACTION_KEY_TORCH = "torch";
 
     private final Context mContext;
     private final GlobalActionsManager mWindowManagerFuncs;
@@ -165,7 +159,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     private final boolean mShowSilentToggle;
     private final EmergencyAffordanceManager mEmergencyAffordanceManager;
     private final ScreenshotHelper mScreenshotHelper;
-    private boolean mTorchEnabled = false;
 
     private BitSet mAirplaneModeBits;
     private final List<PhoneStateListener> mPhoneStateListeners = new ArrayList<>();
@@ -219,10 +212,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
 
         // Set the initial status of airplane mode toggle
         mAirplaneState = getUpdatedAirplaneToggleState();
-
-        // Use cameramanager to get notified of torch state changes
-        mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-        mCameraManager.registerTorchCallback(torchCallback, null);
     }
 
     /**
@@ -348,7 +337,9 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
         mAirplaneModeOn = new ToggleAction(
                 R.drawable.ic_lock_airplane_mode,
                 R.drawable.ic_lock_airplane_mode_off,
-                R.string.global_actions_toggle_airplane_mode) {
+                R.string.global_actions_toggle_airplane_mode,
+                R.string.global_actions_airplane_mode_on_status,
+                R.string.global_actions_airplane_mode_off_status) {
 
             void onToggle(boolean on) {
                 if (mHasTelephony && Boolean.parseBoolean(
@@ -401,71 +392,44 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                 continue;
             }
             if (GLOBAL_ACTION_KEY_POWER.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_POWER, 1) == 1) {
-                    mItems.add(new PowerAction());
-                }
+                mItems.add(new PowerAction());
             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_AIRPLANE, 0) == 1) {
-                    mItems.add(mAirplaneModeOn);
-                }
+                mItems.add(mAirplaneModeOn);
             } else if (GLOBAL_ACTION_KEY_BUGREPORT.equals(actionKey)) {
                 if (Settings.Global.getInt(mContext.getContentResolver(),
                         Settings.Global.BUGREPORT_IN_POWER_MENU, 0) != 0 && isCurrentUserOwner()) {
                     mItems.add(new BugReportAction());
                 }
             } else if (GLOBAL_ACTION_KEY_SILENT.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_SOUNDPANEL, 0) == 1) {
+                if (mShowSilentToggle) {
                     mItems.add(mSilentModeAction);
                 }
             } else if (GLOBAL_ACTION_KEY_USERS.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_USERS, 0) == 1) {
+                if (SystemProperties.getBoolean("fw.power_user_switcher", false)) {
                     addUsersToMenu(mItems);
                 }
             } else if (GLOBAL_ACTION_KEY_SETTINGS.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_SETTINGS, 0) != 0) {
-                    mItems.add(getSettingsAction());
-                }
+                mItems.add(getSettingsAction());
             } else if (GLOBAL_ACTION_KEY_LOCKDOWN.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_LOCKDOWN, 0) != 0) {
+                if (Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                            Settings.Secure.LOCKDOWN_IN_POWER_MENU, 0, getCurrentUser().id) != 0
+                        && shouldDisplayLockdown()) {
                     mItems.add(getLockdownAction());
                     mHasLockdownButton = true;
-                }
-            } else if (GLOBAL_ACTION_KEY_TORCH.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_TORCH, 0) != 0) {
-                    mItems.add(getTorchToggleAction());
                 }
             } else if (GLOBAL_ACTION_KEY_VOICEASSIST.equals(actionKey)) {
                 mItems.add(getVoiceAssistAction());
             } else if (GLOBAL_ACTION_KEY_ASSIST.equals(actionKey)) {
                 mItems.add(getAssistAction());
             } else if (GLOBAL_ACTION_KEY_RESTART.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_RESTART, 1) == 1) {
-                    mItems.add(new RestartAction());
-                }
+                mItems.add(new RestartAction());
             } else if (GLOBAL_ACTION_KEY_SCREENSHOT.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_SCREENSHOT, 0) == 1) {
-                    mItems.add(new ScreenshotAction());
-                }
+                mItems.add(new ScreenshotAction());
             } else if (GLOBAL_ACTION_KEY_LOGOUT.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_LOGOUT, 0) == 1
+                if (mDevicePolicyManager.isLogoutEnabled()
                         && getCurrentUser().id != UserHandle.USER_SYSTEM) {
                     mItems.add(new LogoutAction());
                     mHasLogoutButton = true;
-                }
-            } else if (GLOBAL_ACTION_KEY_RESTART_RECOVERY.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_RESTART_RECOVERY, 1) == 1) {
-                    mItems.add(new AdvancedRestartAction());
                 }
             } else if (GLOBAL_ACTION_KEY_EMERGENCY.equals(actionKey)) {
                 if (mSeparatedEmergencyButtonEnabled
@@ -642,76 +606,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
         }
     }
 
-    private final class AdvancedRestartAction extends SinglePressAction implements LongPressAction {
-        private AdvancedRestartAction() {
-            super(com.android.systemui.R.drawable.ic_restart_advanced, com.android.systemui.R.string.global_action_restart_advanced);
-        }
-
-        @Override
-        public boolean onLongPress() {
-            mWindowManagerFuncs.advancedReboot(PowerManager.REBOOT_BOOTLOADER);
-            return true;
-        }
-
-        @Override
-        public boolean showDuringKeyguard() {
-            return true;
-        }
-
-        @Override
-        public boolean showBeforeProvisioning() {
-            return true;
-        }
-
-        @Override
-        public void onPress() {
-            mWindowManagerFuncs.advancedReboot(PowerManager.REBOOT_RECOVERY);
-        }
-    }
-
-    private CameraManager mCameraManager;
-    CameraManager.TorchCallback torchCallback = new CameraManager.TorchCallback() {
-        @Override
-        public void onTorchModeUnavailable(String cameraId) {
-            super.onTorchModeUnavailable(cameraId);
-        }
-
-        @Override
-        public void onTorchModeChanged(String cameraId, boolean enabled) {
-            super.onTorchModeChanged(cameraId, enabled);
-            mTorchEnabled = enabled;
-        }
-    };
-
-    private Action getTorchToggleAction() {
-        return new SinglePressAction(com.android.systemui.R.drawable.ic_lock_torch,
-                com.android.systemui.R.string.quick_settings_flashlight_label) {
-
-            public void onPress() {
-                try {
-                    for (final String cameraId : mCameraManager.getCameraIdList()) {
-                        CameraCharacteristics characteristics =
-                            mCameraManager.getCameraCharacteristics(cameraId);
-                        int orient = characteristics.get(CameraCharacteristics.LENS_FACING);
-                        if (orient == CameraCharacteristics.LENS_FACING_BACK) {
-                            mCameraManager.setTorchMode(cameraId, !mTorchEnabled);
-                            mTorchEnabled = !mTorchEnabled;
-                        }
-                    }
-                } catch (CameraAccessException e) {
-                }
-            }
-
-            public boolean showDuringKeyguard() {
-                return true;
-            }
-
-            public boolean showBeforeProvisioning() {
-                return false;
-            }
-        };
-    }
-
     private class BugReportAction extends SinglePressAction implements LongPressAction {
 
         public BugReportAction() {
@@ -810,7 +704,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     }
 
     private Action getSettingsAction() {
-        return new SinglePressAction(com.android.systemui.R.drawable.ic_lock_settings,
+        return new SinglePressAction(R.drawable.ic_settings,
                 R.string.global_action_settings) {
 
             @Override
@@ -903,7 +797,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     }
 
     private Action getLockdownAction() {
-        return new SinglePressAction(com.android.systemui.R.drawable.ic_lock_lock,
+        return new SinglePressAction(R.drawable.ic_lock_lockdown,
                 R.string.global_action_lockdown) {
 
             @Override
@@ -1258,26 +1152,32 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             }
         }
 
-        public String getStatus() {
-            return null;
-        }
-
         protected State mState = State.Off;
 
         // prefs
         protected int mEnabledIconResId;
         protected int mDisabledIconResid;
         protected int mMessageResId;
+        protected int mEnabledStatusMessageResId;
+        protected int mDisabledStatusMessageResId;
 
         /**
          * @param enabledIconResId           The icon for when this action is on.
          * @param disabledIconResid          The icon for when this action is off.
          * @param message                    The general information message, e.g 'Silent Mode'
+         * @param enabledStatusMessageResId  The on status message, e.g 'sound disabled'
+         * @param disabledStatusMessageResId The off status message, e.g. 'sound enabled'
          */
-        public ToggleAction(int enabledIconResId, int disabledIconResid, int message) {
+        public ToggleAction(int enabledIconResId,
+                int disabledIconResid,
+                int message,
+                int enabledStatusMessageResId,
+                int disabledStatusMessageResId) {
             mEnabledIconResId = enabledIconResId;
             mDisabledIconResid = disabledIconResid;
             mMessageResId = message;
+            mEnabledStatusMessageResId = enabledStatusMessageResId;
+            mDisabledStatusMessageResId = disabledStatusMessageResId;
         }
 
         /**
@@ -1317,13 +1217,12 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                 icon.setEnabled(enabled);
             }
 
-            final String status = getStatus();
-            if (!TextUtils.isEmpty(status)) {
-                statusView.setText(status);
-            } else {
-                statusView.setVisibility(View.GONE);
-            v.setEnabled(enabled);
+            if (statusView != null) {
+                statusView.setText(on ? mEnabledStatusMessageResId : mDisabledStatusMessageResId);
+                statusView.setVisibility(View.VISIBLE);
+                statusView.setEnabled(enabled);
             }
+            v.setEnabled(enabled);
 
             return v;
         }
@@ -1365,7 +1264,9 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
         public SilentModeToggleAction() {
             super(R.drawable.ic_audio_vol_mute,
                     R.drawable.ic_audio_vol,
-                    R.string.global_action_toggle_silent_mode);
+                    R.string.global_action_toggle_silent_mode,
+                    R.string.global_action_silent_mode_on_status,
+                    R.string.global_action_silent_mode_off_status);
         }
 
         void onToggle(boolean on) {

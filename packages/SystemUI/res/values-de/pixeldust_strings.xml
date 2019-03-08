@@ -41,8 +41,6 @@
     <string name="search">Suche</string>
     <string name="nav_bar_layout_inverse">\"Zurück\"- und \"Letzte Apps\"-Tasten tauschen</string>
 
-    <string name="global_action_restart_advanced">Erweiterter Neustart</string>
-
     <!-- LTE QS Tile -->
     <string name="qs_lte_label">LTE</string>
     <string name="lte_on">LTE EIN</string>
