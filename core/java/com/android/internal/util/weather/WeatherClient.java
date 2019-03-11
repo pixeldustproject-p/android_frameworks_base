@@ -42,7 +42,7 @@ import com.android.internal.R;
 
 public class WeatherClient {
 
-    public static final String SERVICE_PACKAGE = "org.pixelexperience.weather.client.provider";
+    public static final String SERVICE_PACKAGE = "org.pixelexperience.weather.client";
     public static final Uri WEATHER_URI = Uri.parse("content://org.pixelexperience.weather.client.provider/weather");
     public static final int WEATHER_UPDATE_SUCCESS = 0; // Success
     public static final int WEATHER_UPDATE_RUNNING = 1; // Update running
