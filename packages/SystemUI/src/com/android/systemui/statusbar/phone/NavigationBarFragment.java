@@ -234,7 +234,8 @@ Navigator.OnVerticalChangedListener, KeyguardMonitor.Callback, NotificationMedia
 
     public void updateStates() {
         setFullGestureMode();
-        mNavigationBarView.updateStates();
+        if (mNavigationBarView != null && mNavigationBarView.getBaseView().isAttachedToWindow())
+            mNavigationBarView.updateStates();
         updateScreenPinningGestures();
     }
 
