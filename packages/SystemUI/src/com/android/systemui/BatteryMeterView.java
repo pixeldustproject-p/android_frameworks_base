@@ -303,6 +303,7 @@ public class BatteryMeterView extends LinearLayout implements
                 setForceShowPercent(mCharging);
             }
         }
+        updatePercentText();
         setContentDescription(
                 getContext().getString(charging ? R.string.accessibility_battery_level_charging
                         : R.string.accessibility_battery_level, level));
