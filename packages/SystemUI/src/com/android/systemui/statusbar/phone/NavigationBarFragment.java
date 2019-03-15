@@ -221,11 +221,11 @@ Navigator.OnVerticalChangedListener, KeyguardMonitor.Callback, NotificationMedia
         @Override
         public void onBackButtonAlphaChanged(float alpha, boolean animate) {
             final ButtonDispatcher backButton = mNavigationBarView.getBackButton();
-            if (mFullGestureMode) {
-                backButton.setVisibility(View.INVISIBLE);
-                return;
-            }
             if (backButton != null) {
+                if (mFullGestureMode) {
+                    backButton.setVisibility(View.INVISIBLE);
+                    return;
+                }
                 backButton.setVisibility(alpha > 0 ? View.VISIBLE : View.INVISIBLE);
                 backButton.setAlpha(alpha, animate);
             }
