@@ -289,11 +289,6 @@ public class BatteryMeterView extends LinearLayout implements
 
     @Override
     public void onBatteryLevelChanged(int level, boolean pluggedIn, boolean charging) {
-        if (mLevel != level) {
-            mLevel = level;
-            mDrawable.setBatteryLevel(mLevel);
-            setForceShowPercent(mCharging);
-        }
         if (mCharging != pluggedIn) {
             mCharging = pluggedIn;
             mDrawable.setCharging(mCharging);
@@ -303,6 +298,9 @@ public class BatteryMeterView extends LinearLayout implements
                 setForceShowPercent(mCharging);
             }
         }
+        mDrawable.setBatteryLevel(level);
+        mDrawable.setCharging(pluggedIn);
+        mLevel = level;
         updatePercentText();
         setContentDescription(
                 getContext().getString(charging ? R.string.accessibility_battery_level_charging
@@ -382,6 +380,7 @@ public class BatteryMeterView extends LinearLayout implements
             }
         }
         mDrawable.setShowPercent(!mCharging && !mShow && mShowBatteryPercent != 2);
+        mDrawable.refresh();
     }
 
     @Override
