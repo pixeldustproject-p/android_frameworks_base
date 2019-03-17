@@ -2121,7 +2121,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 }
             } break;
             case SHOW_FINGERPRINT_ERROR_UI_MSG: {
-                if (mShowDialogs) {
+                /*if (mShowDialogs) {
                     String buildfingerprint = SystemProperties.get("ro.build.fingerprint");
                     String[] splitfingerprint = buildfingerprint.split("/");
                     String vendorid = splitfingerprint[3];
@@ -2133,7 +2133,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                     d.setButton(DialogInterface.BUTTON_POSITIVE, mUiContext.getText(R.string.ok),
                             obtainMessage(DISMISS_DIALOG_UI_MSG, d));
                     d.show();
-                }
+                }*/
             } break;
             case SHOW_COMPAT_MODE_DIALOG_UI_MSG: {
                 synchronized (ActivityManagerService.this) {
